@@ -18,7 +18,8 @@ CTAS covers the whole control-IC space with **one** agnostic schema, discriminat
 | `shuntRegulator` | TL431, TLV431 |
 | `voltageReference` | LM4040, REF5025 |
 | `currentSenseAmplifier` / `isolatedAmplifier` | INA240, AMC1301, AMC1306 |
-| `hotSwapController` / `eFuse` | LM5066, TPS25940 |
+| `hotSwapController` / `eFuse` / `loadSwitch` | LM5066, TPS25940, TPS22918 |
+| `supervisor` | TPS3700, UCD9090, ADM1266 (sequencer / voltage-monitor / watchdog) |
 
 The trick that keeps the field count low without losing coverage: the parametric core (`function` + the common `electrical` scalars) is shared across every category, and the category-specific data lives in **optional, closed capability sub-objects** under `electrical` (`currentMode`, `gateDrive`, `uvlo[]`, `isolation`, `senseAmplifier`, `shuntReference`, `voltageReference`, `hotSwap`, `syncRectifier`, `burstMode`, `brownOut`, `pfc`, `loadLine`, `synchronization`, `integratedPowerStage`). A TL431 carries `shuntReference` only; a UCC21520 carries `gateDrive` + `isolation` + `uvlo[]`; neither ever sees a field it cannot use.
 

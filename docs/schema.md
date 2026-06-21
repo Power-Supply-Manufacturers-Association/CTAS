@@ -6,7 +6,7 @@ Vendor-neutral JSON Schema (draft 2020-12) data model for power-electronics **co
 
 ## Design principle: one schema, category-gated capability sub-objects
 
-Control ICs span PWM/LLC/PFC switchers, gate drivers, digital/PMBus controllers, references, sense amps and hot-swap front-ends. Rather than a `oneOf` explosion (one giant union per category) or a flat field bag (where a TL431 would carry `slopeCompensation`), CTAS keeps:
+Control ICs span PWM/LLC/PFC switchers, gate drivers, digital/PMBus controllers, references, sense amps, hot-swap/eFuse/load-switch front-ends and supervisors/sequencers. Rather than a `oneOf` explosion (one giant union per category) or a flat field bag (where a TL431 would carry `slopeCompensation`), CTAS keeps:
 
 - a **shared core** — `function` (the category discriminator + topology/modulation/channels) and the **common `electrical` scalars** (supply, frequency, duty, reference, soft-start) that almost every part publishes; plus
 - **optional CLOSED capability sub-objects** under `electrical`, each populated **only** for the categories that use it.
