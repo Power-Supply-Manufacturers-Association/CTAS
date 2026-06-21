@@ -1,0 +1,214 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://psma.com/ctas/utils.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "title": "utils",
+    "description": "Controller-family-specific shared definitions for CTAS: the controlled vocabularies (category / modulation / conduction-mode / protection / pin-function / telemetry) and the controller package code. These are owned by CTAS, not PEAS, because no other component family uses them (CTAS follows the CONAS pattern: reuse the universal primitives from https://psma.com/peas/utils.json, own the family-specific enums here). Vocabularies derived from a datasheet survey of mainstream PWM / LLC / PFC / phase-shift / sync-rectifier / digital-PMBus controllers, isolated & non-isolated gate drivers, shunt regulators, voltage references, current-sense & isolated amplifiers, and hot-swap / eFuse controllers (TI, Analog Devices, onsemi, Infineon, ST, Renesas, Power Integrations).",
+    "$defs": {
+        "controllerCategory": {
+            "description": "Functional category of a control IC. THE primary selection discriminator (required at datasheetInfo.function.category and at the design seed). One value per part; multi-function parts pick the dominant function.",
+            "type": "string",
+            "title": "controllerCategory",
+            "enum": [
+                "pwmController",
+                "multiphaseController",
+                "llcController",
+                "pfcController",
+                "dualPwmController",
+                "phaseShiftController",
+                "syncRectifierController",
+                "gateDriver",
+                "digitalController",
+                "secondaryFeedbackController",
+                "optocouplerFeedback",
+                "currentSenseAmplifier",
+                "isolatedAmplifier",
+                "voltageReference",
+                "shuntRegulator",
+                "hotSwapController",
+                "eFuse"
+            ]
+        },
+        "controllerModulation": {
+            "description": "Modulation / control law implemented by the controller. Determines the small-signal plant order for behavioural simulation. `notApplicable` for parts that do not modulate (references, current-sense amps, plain gate drivers, opto feedback). Note: digital-ness is NOT a modulation value — it is implied by datasheetInfo.digitalInterface.digitalControl; a digital controller still names its underlying law (e.g. peakCurrentMode).",
+            "type": "string",
+            "title": "controllerModulation",
+            "enum": [
+                "voltageMode",
+                "peakCurrentMode",
+                "averageCurrentMode",
+                "hysteretic",
+                "hybridHysteretic",
+                "constantOnTime",
+                "constantOffTime",
+                "chargeMode",
+                "frequencyModulation",
+                "phaseShiftedPwm",
+                "resonantCurrentMode",
+                "valleySwitching",
+                "notApplicable"
+            ]
+        },
+        "controllerConductionMode": {
+            "description": "Conduction mode the controller is designed for. `crcm` = critical/transition (boundary) mode.",
+            "type": "string",
+            "title": "controllerConductionMode",
+            "enum": [
+                "ccm",
+                "dcm",
+                "crcm",
+                "quasiResonant",
+                "multimode",
+                "notApplicable"
+            ]
+        },
+        "controllerSyncRectification": {
+            "description": "Synchronous-rectification support offered by the controller. `builtIn` drives the SR gate directly; `controlOnly` provides SR timing to an external SR driver; `external` expects a separate SR controller.",
+            "type": "string",
+            "title": "controllerSyncRectification",
+            "enum": [
+                "none",
+                "builtIn",
+                "external",
+                "controlOnly"
+            ]
+        },
+        "controllerIsolation": {
+            "description": "Position of the controller relative to the converter's isolation barrier.",
+            "type": "string",
+            "title": "controllerIsolation",
+            "enum": [
+                "none",
+                "primarySide",
+                "secondarySide",
+                "primaryToSecondary"
+            ]
+        },
+        "controllerProtectionKind": {
+            "description": "Built-in protection EVENTS a control IC can detect on its own pins. UVLO is intentionally absent: it is an operating boundary carried richly by datasheetInfo.electrical.uvlo (start/stop/side), not a protections[] row, so it is never double-modelled. Multi-level OCP is expressed as multiple `ocp` rows (distinguished by threshold/responseTime).",
+            "type": "string",
+            "title": "controllerProtectionKind",
+            "enum": [
+                "ovp",
+                "uvp",
+                "ocp",
+                "scp",
+                "otp",
+                "otw",
+                "opp",
+                "brownOut",
+                "lineOvervoltage",
+                "desaturation",
+                "openLoop",
+                "restartTimer",
+                "frequencyFoldback"
+            ]
+        },
+        "protectionMode": {
+            "description": "Recovery behaviour of a protection event. `warningOnly` flags without acting (a telemetry/PGOOD assertion); `frequencyShift` reduces switching frequency rather than shutting down (LLC capacitive-mode / OLP).",
+            "type": "string",
+            "title": "protectionMode",
+            "enum": [
+                "hiccup",
+                "latch",
+                "autorestart",
+                "foldback",
+                "constantCurrent",
+                "frequencyShift",
+                "warningOnly"
+            ]
+        },
+        "telemetryChannel": {
+            "description": "A quantity reported over the digital interface (PMBus / I2C / SPI / AVSBus). PMBus READ_* commands map 1:1 onto these flags, so a separate supported-command list is unnecessary. `voltage` / `current` are output-side unless an input* variant is also present.",
+            "type": "string",
+            "title": "telemetryChannel",
+            "enum": [
+                "voltage",
+                "current",
+                "inputVoltage",
+                "inputCurrent",
+                "phaseCurrent",
+                "temperature",
+                "power",
+                "energy",
+                "frequency",
+                "dutyCycle",
+                "faultStatus"
+            ]
+        },
+        "controllerPinFunction": {
+            "description": "Canonical function of one pin of a control IC. Vocabulary covers every pin function published by mainstream PWM / LLC / PFC / digital controllers, isolated gate drivers, sync-rectifier controllers, shunt references, current-sense / isolated amplifiers, and PMBus telemetry parts. Used by the slim pin map so a stencil can wire the part into a circuit.",
+            "type": "string",
+            "title": "controllerPinFunction",
+            "enum": [
+                "vcc",
+                "vdd",
+                "vddLow",
+                "vddHigh",
+                "vee",
+                "vbias",
+                "vin",
+                "gnd",
+                "pgnd",
+                "agnd",
+                "feedback",
+                "compensation",
+                "currentSense",
+                "currentSensePositive",
+                "currentSenseNegative",
+                "drainSense",
+                "gateHighSide",
+                "gateLowSide",
+                "gate",
+                "pwmOutput",
+                "syncRectifierGate",
+                "bootstrap",
+                "switchNode",
+                "enable",
+                "syncIn",
+                "syncOut",
+                "rt",
+                "ct",
+                "rtct",
+                "softStart",
+                "slopeCompensation",
+                "frequencySet",
+                "modeSelect",
+                "pmbusData",
+                "pmbusClock",
+                "pmbusAlert",
+                "smbusData",
+                "smbusClock",
+                "i2cData",
+                "i2cClock",
+                "spiClock",
+                "spiMosi",
+                "spiMiso",
+                "spiCs",
+                "address",
+                "vref",
+                "vrefBuffered",
+                "tempSense",
+                "tempReport",
+                "iSense",
+                "vSense",
+                "vidInput",
+                "powerGood",
+                "fault",
+                "brownOut",
+                "lineSense",
+                "zeroCrossingDetect",
+                "auxiliaryWinding",
+                "demagDetect",
+                "multiplier",
+                "noConnect"
+            ]
+        },
+        "packageType": {
+            "description": "Mechanical package code. Open vocabulary using standard JEDEC / EIA / manufacturer designators (SOT23-6, SOIC-8, SOIC-14, MSOP-10, TSSOP-14, VSSOP-8, QFN-16, QFN-24, DFN-10, WSON-8, LQFP-32, TO-220, TO-263, DPAK, BGA, etc.). CTAS-owned because controller packages are IC packages, distinct from the magnetic/capacitor case codes other families use.",
+            "type": "string",
+            "title": "packageType",
+            "minLength": 1
+        }
+    }
+}

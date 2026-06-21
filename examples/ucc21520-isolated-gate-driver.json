@@ -1,0 +1,121 @@
+{
+    "inputs": {
+        "designRequirements": {
+            "name": "Reinforced half-bridge SiC gate driver",
+            "category": "gateDriver",
+            "isolation": "primaryToSecondary",
+            "isolationRatingRmsMin": 5000.0,
+            "cmtiMin": 100000000000.0,
+            "minimumGateDriveCurrent": 4.0,
+            "supplyVoltageAvailable": {
+                "minimum": 15.0,
+                "maximum": 18.0,
+                "unit": "V"
+            },
+            "aecQGrade": "Q100-G1"
+        }
+    },
+    "controller": {
+        "manufacturerInfo": {
+            "name": "Texas Instruments",
+            "reference": "UCC21520",
+            "status": "production",
+            "datasheetUrl": "https://www.ti.com/lit/ds/symlink/ucc21520.pdf",
+            "datasheetInfo": {
+                "part": {
+                    "partNumber": "UCC21520DW",
+                    "case": "SOIC-16W",
+                    "deviceType": "controller",
+                    "technology": "isolatedGateDriver"
+                },
+                "function": {
+                    "category": "gateDriver",
+                    "modulation": "notApplicable",
+                    "channelCount": 2,
+                    "isolation": "primaryToSecondary"
+                },
+                "electrical": {
+                    "gateDrive": {
+                        "sourceCurrentPeak": 4.0,
+                        "sinkCurrentPeak": 6.0,
+                        "driveVoltage": {
+                            "minimum": 9.2,
+                            "maximum": 33.0,
+                            "unit": "V"
+                        },
+                        "negativeBiasMin": -5.0,
+                        "propagationDelay": 1.9e-08,
+                        "propagationDelayMatching": 5.0e-09,
+                        "minPulseWidth": 2.0e-08,
+                        "channelConfiguration": "halfBridge",
+                        "interlock": true,
+                        "deadTimeMode": "programmable"
+                    },
+                    "uvlo": [
+                        {
+                            "startThreshold": 5.6,
+                            "stopThreshold": 5.0,
+                            "side": "input"
+                        },
+                        {
+                            "startThreshold": 8.0,
+                            "stopThreshold": 6.0,
+                            "side": "output",
+                            "selectableOptions": [
+                                8.0,
+                                12.0
+                            ]
+                        }
+                    ],
+                    "isolation": {
+                        "isolationType": "reinforced",
+                        "withstandVoltageRms": 5700.0,
+                        "workingVoltage": 2121.0,
+                        "surgeVoltage": 12800.0,
+                        "cmti": 125000000000.0
+                    }
+                },
+                "protections": [
+                    {
+                        "kind": "otw",
+                        "mode": "warningOnly"
+                    }
+                ],
+                "pins": [
+                    {
+                        "number": 1,
+                        "name": "INA",
+                        "function": "enable"
+                    },
+                    {
+                        "number": 14,
+                        "name": "OUTA",
+                        "function": "gateHighSide"
+                    },
+                    {
+                        "number": 11,
+                        "name": "OUTB",
+                        "function": "gateLowSide"
+                    }
+                ],
+                "thermal": {
+                    "operatingTemperature": {
+                        "minimum": -40.0,
+                        "maximum": 125.0,
+                        "unit": "Cel"
+                    },
+                    "maximumJunctionTemperature": 150.0
+                },
+                "mechanical": {
+                    "packageType": "SOIC-16W",
+                    "assemblyType": "smt"
+                },
+                "compliance": {
+                    "aecQGrade": "Q100-G1",
+                    "rohsCompliant": true
+                }
+            }
+        }
+    },
+    "outputs": []
+}

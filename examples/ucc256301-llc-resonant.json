@@ -1,0 +1,183 @@
+{
+    "inputs": {
+        "designRequirements": {
+            "name": "Isolated 300 W LLC stage controller",
+            "category": "llcController",
+            "topology": "llcResonantConverter",
+            "modulation": "hybridHysteretic",
+            "conductionMode": "quasiResonant",
+            "isolation": "primarySide",
+            "syncRectification": "controlOnly",
+            "supplyVoltageAvailable": {
+                "minimum": 13.0,
+                "maximum": 26.0,
+                "unit": "V"
+            },
+            "switchingFrequency": {
+                "minimum": 35000.0,
+                "maximum": 1000000.0,
+                "unit": "Hz"
+            },
+            "maximumStandbyPower": 0.075,
+            "requiredProtections": [
+                "ovp",
+                "otp",
+                "scp",
+                "brownOut"
+            ]
+        },
+        "operatingPoints": [
+            {
+                "name": "full load",
+                "ambientTemperature": 45.0,
+                "supplyVoltage": 16.0,
+                "switchingFrequency": 95000.0,
+                "loadFraction": 1.0
+            }
+        ]
+    },
+    "controller": {
+        "manufacturerInfo": {
+            "name": "Texas Instruments",
+            "reference": "UCC256301",
+            "status": "production",
+            "datasheetUrl": "https://www.ti.com/lit/ds/symlink/ucc256301.pdf",
+            "datasheetInfo": {
+                "part": {
+                    "partNumber": "UCC256301",
+                    "series": "UCC2563xx",
+                    "case": "SOIC-16",
+                    "deviceType": "controller",
+                    "technology": "hybridHysteretic"
+                },
+                "function": {
+                    "category": "llcController",
+                    "intendedTopologies": [
+                        "llcResonantConverter"
+                    ],
+                    "modulation": "hybridHysteretic",
+                    "conductionMode": "quasiResonant",
+                    "channelCount": 1,
+                    "syncRectification": "controlOnly",
+                    "isolation": "primarySide",
+                    "frequencyJitterSupported": false
+                },
+                "electrical": {
+                    "supplyVoltage": {
+                        "minimum": 13.0,
+                        "maximum": 26.0,
+                        "unit": "V"
+                    },
+                    "supplyVoltageAbsoluteMax": 28.0,
+                    "switchingFrequencyMin": 35000.0,
+                    "switchingFrequencyMax": 1000000.0,
+                    "highVoltageStartup": "integrated",
+                    "capacitiveModeProtection": "zcsDetect",
+                    "gateDrive": {
+                        "sourceCurrentPeak": 0.5,
+                        "sinkCurrentPeak": 1.0,
+                        "driveVoltage": {
+                            "nominal": 13.0,
+                            "unit": "V"
+                        },
+                        "channelConfiguration": "halfBridge",
+                        "interlock": true,
+                        "deadTimeMode": "adaptive",
+                        "adaptiveDeadTime": true
+                    },
+                    "uvlo": [
+                        {
+                            "startThreshold": 17.0,
+                            "stopThreshold": 11.7,
+                            "side": "input"
+                        },
+                        {
+                            "startThreshold": 7.94,
+                            "side": "floating"
+                        }
+                    ],
+                    "burstMode": {
+                        "entryThreshold": 0.9,
+                        "exitThreshold": 1.1,
+                        "programmable": true,
+                        "standbyPower": 0.05
+                    },
+                    "brownOut": {
+                        "threshold": 80.0,
+                        "hysteresis": 10.0
+                    }
+                },
+                "protections": [
+                    {
+                        "kind": "ovp",
+                        "mode": "latch",
+                        "rail": "output"
+                    },
+                    {
+                        "kind": "otp",
+                        "mode": "autorestart"
+                    },
+                    {
+                        "kind": "scp",
+                        "mode": "hiccup"
+                    },
+                    {
+                        "kind": "brownOut",
+                        "mode": "autorestart",
+                        "rail": "input"
+                    }
+                ],
+                "pins": [
+                    {
+                        "number": 1,
+                        "name": "HB",
+                        "function": "switchNode"
+                    },
+                    {
+                        "number": 5,
+                        "name": "FB",
+                        "function": "feedback"
+                    },
+                    {
+                        "number": 16,
+                        "name": "HV",
+                        "function": "vin"
+                    }
+                ],
+                "thermal": {
+                    "operatingTemperature": {
+                        "minimum": -40.0,
+                        "maximum": 125.0,
+                        "unit": "Cel"
+                    },
+                    "maximumJunctionTemperature": 150.0
+                },
+                "mechanical": {
+                    "packageType": "SOIC-16",
+                    "assemblyType": "smt"
+                },
+                "compliance": {
+                    "rohsCompliant": true,
+                    "reachCompliant": true
+                }
+            }
+        }
+    },
+    "outputs": [
+        {
+            "biasLoss": {
+                "origin": "simulation",
+                "methodUsed": "CTAS bias-loss model v1",
+                "quiescentLoss": 0.048,
+                "gateDriveLoss": 0.21,
+                "totalLoss": 0.258
+            },
+            "thermal": {
+                "origin": "simulation",
+                "methodUsed": "single-resistance thetaJA",
+                "junctionTemperature": 71.0,
+                "passes": true
+            }
+        }
+    ]
+}

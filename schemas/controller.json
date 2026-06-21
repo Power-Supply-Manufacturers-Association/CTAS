@@ -1,0 +1,1285 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://psma.com/ctas/controller.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "title": "controller",
+    "description": "Controller (control IC) component payload. ONE agnostic schema for every power-electronics control IC: PWM / multiphase / LLC-resonant / PFC / dual / phase-shift / sync-rectifier controllers, isolated & non-isolated gate drivers, digital/PMBus controllers, secondary-side & opto feedback, shunt regulators, voltage references, current-sense & isolated amplifiers, and hot-swap / eFuse controllers. function.category is the required discriminator; `electrical` is partitioned into optional CLOSED capability sub-objects that appear ONLY for the categories that use them (a TL431 carries shuntReference, never slopeCompensation) — this satisfies 'fewest fields / no redundancy / cover all cases' without a per-category oneOf explosion. The root is the unwrapped payload that PEAS references for its `controller` branch and that TAS validates each controllers.ndjson record against. An empty `{}` is a valid pre-librarian seed; a resolved part carries manufacturerInfo (which itself carries datasheetInfo). Field list derived from a datasheet survey of TI / Analog Devices / onsemi / Infineon / ST / Renesas / Power Integrations parts.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "manufacturerInfo": {
+            "$ref": "#/$defs/manufacturerInfo"
+        },
+        "distributorsInfo": {
+            "description": "Where to buy this controller.",
+            "type": "array",
+            "items": {
+                "$ref": "https://psma.com/peas/utils.json#/$defs/distributorInfo"
+            }
+        },
+        "substitutesInfo": {
+            "description": "Cross-reference / second-source parts.",
+            "type": "array",
+            "items": {
+                "$ref": "https://psma.com/peas/utils.json#/$defs/substituteInfo"
+            }
+        }
+    },
+    "$defs": {
+        "manufacturerInfo": {
+            "description": "Identity of the resolved real part plus its parametric catalog block (datasheetInfo). Mirrors the CAS / CONAS nesting (datasheetInfo lives under manufacturerInfo).",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "datasheetInfo"
+            ],
+            "properties": {
+                "name": {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo/properties/name"
+                },
+                "reference": {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo/properties/reference"
+                },
+                "status": {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo/properties/status"
+                },
+                "description": {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo/properties/description"
+                },
+                "orderCode": {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo/properties/orderCode"
+                },
+                "datasheetUrl": {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo/properties/datasheetUrl"
+                },
+                "family": {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo/properties/family"
+                },
+                "series": {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo/properties/series"
+                },
+                "datasheetInfo": {
+                    "$ref": "#/$defs/datasheetInfo"
+                }
+            }
+        },
+        "datasheetInfo": {
+            "description": "All parametric information extracted from the controller datasheet. `function` is required (carries the category discriminator); every other block is independently optional.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "function"
+            ],
+            "properties": {
+                "part": {
+                    "$ref": "#/$defs/part"
+                },
+                "function": {
+                    "$ref": "#/$defs/function"
+                },
+                "electrical": {
+                    "$ref": "#/$defs/electrical"
+                },
+                "protections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/protection"
+                    }
+                },
+                "pins": {
+                    "description": "Slim canonical pin map for stencil wiring. The (number, name, function) triple is canonical; per-pin absolute-max ratings are intentionally NOT modelled here.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/pin"
+                    }
+                },
+                "digitalInterface": {
+                    "$ref": "#/$defs/digitalInterface"
+                },
+                "thermal": {
+                    "$ref": "#/$defs/thermal"
+                },
+                "mechanical": {
+                    "$ref": "#/$defs/mechanical"
+                },
+                "compliance": {
+                    "$ref": "#/$defs/compliance"
+                }
+            }
+        },
+        "part": {
+            "description": "Part identification. Extends the shared datasheetInfoPartBase (partNumber / series / case / description) with the controller-specific deviceType + technology tags.",
+            "allOf": [
+                {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/datasheetInfoPartBase"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "partNumber": {},
+                        "series": {},
+                        "case": {},
+                        "description": {},
+                        "deviceType": {
+                            "description": "Coarse device class as the source catalog tagged it (almost always 'controller'). The authoritative functional class is function.category.",
+                            "type": "string"
+                        },
+                        "technology": {
+                            "description": "Manufacturer process / family tag as published (e.g. 'BiCMOS', 'pwm', 'InnoSwitch3'). Free text; not a selection key.",
+                            "type": "string"
+                        }
+                    },
+                    "unevaluatedProperties": false
+                }
+            ]
+        },
+        "function": {
+            "description": "What the controller is and does. Mirrors the 'Description / Features' page. category is the required selection discriminator.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "category"
+            ],
+            "properties": {
+                "category": {
+                    "$ref": "./utils.json#/$defs/controllerCategory"
+                },
+                "intendedTopologies": {
+                    "description": "Topology families this controller is designed for. Empty/absent for non-converter parts (references, current-sense amps).",
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://psma.com/peas/utils.json#/$defs/topology"
+                    },
+                    "uniqueItems": true
+                },
+                "modulation": {
+                    "$ref": "./utils.json#/$defs/controllerModulation"
+                },
+                "conductionMode": {
+                    "$ref": "./utils.json#/$defs/controllerConductionMode"
+                },
+                "channelCount": {
+                    "description": "Number of independent regulation channels / control loops.",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "maxPhaseCount": {
+                    "description": "Maximum number of interleaved power phases the part can drive on one rail (reconfigurable VR controllers, e.g. 6+2). Invariant: maxPhaseCount >= channelCount.",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "phaseShedding": {
+                    "description": "True if the controller drops/adds phases with load (only meaningful when maxPhaseCount > 1).",
+                    "type": "boolean"
+                },
+                "currentSharing": {
+                    "description": "Multi-phase / paralleled current-sharing scheme.",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "passive",
+                        "active",
+                        "masterSlave",
+                        "interactivePhase"
+                    ]
+                },
+                "syncRectification": {
+                    "$ref": "./utils.json#/$defs/controllerSyncRectification"
+                },
+                "isolation": {
+                    "$ref": "./utils.json#/$defs/controllerIsolation"
+                },
+                "frequencyJitterSupported": {
+                    "description": "True if the controller implements frequency dithering for conducted-EMI reduction.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "electrical": {
+            "description": "Operating electrical characteristics. Common scalars at the top; optional CLOSED capability sub-objects below, each populated ONLY for the categories that use it.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "supplyVoltage": {
+                    "description": "Operating VCC / VDD range, in volts.",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "supplyVoltageAbsoluteMax": {
+                    "description": "Absolute-maximum VCC, in volts (abs-max table).",
+                    "type": "number"
+                },
+                "quiescentCurrent": {
+                    "description": "Typical operating supply current, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "startupCurrent": {
+                    "description": "Supply current before UVLO release (start-up draw on VCC), in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "switchingFrequencyMin": {
+                    "description": "Lowest programmable / regulated switching frequency, in Hz. For a fixed-frequency part set min == max. For LLC this is the bottom of the regulation band.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "switchingFrequencyMax": {
+                    "description": "Highest programmable / regulated switching frequency, in Hz. For LLC this is the band top / soft-start sweep start frequency.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "maxDutyCycle": {
+                    "description": "Maximum achievable duty cycle, dimensionless 0..1.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "maxDutyCycleClampType": {
+                    "description": "How the maximum duty cycle is bounded. 'toggleFlipFlop' = structural 50% ceiling from a steering flip-flop (UC1845); 'programmable' = a settable DMAX; 'none' = no internal clamp (UC3842 ~100%). The numeric ceiling itself is maxDutyCycle.",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "toggleFlipFlop",
+                        "programmable"
+                    ]
+                },
+                "minOnTime": {
+                    "description": "Minimum controllable on-time, in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "minOffTime": {
+                    "description": "Minimum controllable off-time, in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "referenceVoltage": {
+                    "description": "Internal feedback / bandgap reference seen at the error-amp input, in volts.",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "referenceTolerance": {
+                    "description": "Initial accuracy of the reference, as a fraction (0.01 = 1%).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "softStartTime": {
+                    "description": "Internal / programmed soft-start ramp duration, in seconds.",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "leadingEdgeBlanking": {
+                    "description": "Leading-edge blanking applied to the current-sense input, in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "slopeCompensation": {
+                    "description": "Slope-compensation source (peak-current-mode parts).",
+                    "type": "string",
+                    "enum": [
+                        "internal",
+                        "external",
+                        "notApplicable"
+                    ]
+                },
+                "deadTime": {
+                    "description": "Dead time between complementary outputs, in seconds. Use for single-edge parts only; multi-edge parts (PSFB) use gateDrive.deadTimes[].",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "lightLoadMode": {
+                    "description": "Light-load efficiency mode.",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "skipCycle",
+                        "burstMode",
+                        "frequencyFoldback"
+                    ]
+                },
+                "highVoltageStartup": {
+                    "description": "On-die high-voltage start-up cell that charges VCC from the bulk rail.",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "integrated",
+                        "external"
+                    ]
+                },
+                "capacitiveModeProtection": {
+                    "description": "LLC/resonant ZVS-loss (capacitive-mode) protection method.",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "zcsDetect",
+                        "resonantCurrentPolarity",
+                        "onTimeLimit"
+                    ]
+                },
+                "dynamicResponseEnhancer": {
+                    "description": "True if the part has a transient-boost / dynamic-response-enhancement path (DRE / EDR).",
+                    "type": "boolean"
+                },
+                "currentMode": {
+                    "$ref": "#/$defs/currentMode"
+                },
+                "errorAmplifier": {
+                    "$ref": "#/$defs/errorAmplifier"
+                },
+                "gateDrive": {
+                    "$ref": "#/$defs/gateDrive"
+                },
+                "uvlo": {
+                    "description": "Under-voltage-lockout domains. An array because isolated drivers and integrated-half-bridge parts have more than one (input-logic / driver-output / floating high-side), each on its own rail.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/uvlo"
+                    }
+                },
+                "isolation": {
+                    "$ref": "#/$defs/isolationRating"
+                },
+                "senseAmplifier": {
+                    "$ref": "#/$defs/senseAmplifier"
+                },
+                "shuntReference": {
+                    "$ref": "#/$defs/shuntReference"
+                },
+                "voltageReference": {
+                    "$ref": "#/$defs/voltageReference"
+                },
+                "hotSwap": {
+                    "$ref": "#/$defs/hotSwap"
+                },
+                "syncRectifier": {
+                    "$ref": "#/$defs/syncRectifier"
+                },
+                "burstMode": {
+                    "$ref": "#/$defs/burstMode"
+                },
+                "brownOut": {
+                    "$ref": "#/$defs/brownOut"
+                },
+                "pfc": {
+                    "$ref": "#/$defs/pfc"
+                },
+                "loadLine": {
+                    "$ref": "#/$defs/loadLine"
+                },
+                "synchronization": {
+                    "$ref": "#/$defs/synchronization"
+                },
+                "integratedPowerStage": {
+                    "$ref": "#/$defs/integratedPowerStage"
+                }
+            }
+        },
+        "currentMode": {
+            "description": "Current-mode (peak / average) modulator characteristics. The CS-comparator clamp is the single non-derivable headline parameter for current-mode parts.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "maxThresholdVoltage": {
+                    "description": "Maximum current-sense comparator threshold (peak CS clamp), in volts (UC384x 1.0 V, NCP1250 0.8 V, UCC28950 2.0 V).",
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "errorAmplifier": {
+            "description": "Internal error-amplifier characteristics (compensator design).",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "voltage",
+                        "transconductance"
+                    ]
+                },
+                "transconductance": {
+                    "description": "Forward transconductance gm, in siemens (transconductance amplifiers).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "openLoopGain": {
+                    "description": "DC open-loop gain, in dB (voltage amplifiers).",
+                    "type": "number"
+                },
+                "gainBandwidth": {
+                    "description": "Gain-bandwidth product, in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "outputSourceCurrent": {
+                    "description": "Peak source current of the amplifier output, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "outputSinkCurrent": {
+                    "description": "Peak sink current of the amplifier output, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "secondInstance": {
+                    "description": "True when the part has a second (current-loop) amplifier, e.g. a PFC average-current-mode gm-i amp distinct from the voltage gm-v amp (UCC28180).",
+                    "type": "boolean"
+                }
+            }
+        },
+        "gateDrive": {
+            "description": "Gate-driver output stage (parts with an on-die driver: drivers and switchers with integrated outputs).",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "sourceCurrentPeak": {
+                    "description": "Peak source (pull-up) current, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "sinkCurrentPeak": {
+                    "description": "Peak sink (pull-down) current, in amperes. Kept separate from source because they are usually asymmetric.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "driveVoltage": {
+                    "description": "Positive output-side drive-rail range, in volts.",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "negativeBiasMin": {
+                    "description": "Most-negative turn-off bias the output rail supports (bipolar SiC/IGBT drivers), in volts (negative). Omit for unipolar drivers.",
+                    "type": "number",
+                    "maximum": 0
+                },
+                "riseTime": {
+                    "description": "10%-90% rise time, in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "fallTime": {
+                    "description": "90%-10% fall time, in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "propagationDelay": {
+                    "description": "Input-to-output propagation delay, in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "propagationDelayMatching": {
+                    "description": "Channel-to-channel propagation-delay matching, in seconds (sizes the minimum usable dead time).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "minPulseWidth": {
+                    "description": "Minimum input pulse the driver will pass, in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "channelConfiguration": {
+                    "description": "Output topology of the driver.",
+                    "type": "string",
+                    "enum": [
+                        "singleLow",
+                        "singleHigh",
+                        "dualLow",
+                        "dualHigh",
+                        "halfBridge"
+                    ]
+                },
+                "interlock": {
+                    "description": "True if outputs are interlocked against shoot-through (half-bridge drivers).",
+                    "type": "boolean"
+                },
+                "activeMillerClamp": {
+                    "description": "True if the driver has an active Miller clamp for the off state.",
+                    "type": "boolean"
+                },
+                "deadTimeMode": {
+                    "description": "How dead time is set.",
+                    "type": "string",
+                    "enum": [
+                        "fixed",
+                        "programmable",
+                        "externalResistor",
+                        "adaptive",
+                        "interlockOnly",
+                        "none"
+                    ]
+                },
+                "deadTimes": {
+                    "description": "Named dead-time / delay edges for multi-edge controllers (PSFB UCC28950 DELAB/DELCD/DELEF). Supersedes the scalar electrical.deadTime.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "edge",
+                            "value"
+                        ],
+                        "properties": {
+                            "edge": {
+                                "type": "string",
+                                "enum": [
+                                    "legAB",
+                                    "legCD",
+                                    "leadingEdge",
+                                    "trailingEdge",
+                                    "primaryToSyncRectifier"
+                                ]
+                            },
+                            "value": {
+                                "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                            }
+                        }
+                    }
+                },
+                "adaptiveDeadTime": {
+                    "description": "True if dead time is adapted from sensed dV/dt (ZVS tracking).",
+                    "type": "boolean"
+                },
+                "gateCurrentProgrammable": {
+                    "description": "True if the gate-drive strength (IDRIVE) is programmable in steps (smart gate drivers, DRV835x).",
+                    "type": "boolean"
+                },
+                "slewRateProgrammable": {
+                    "description": "True if output slew rate is adjustable (GaN smart drivers, RDRV).",
+                    "type": "boolean"
+                }
+            }
+        },
+        "uvlo": {
+            "description": "Under-voltage-lockout operating boundary. Carried here (not as a protections[] row) so the start/stop thresholds and the rail they apply to are first-class.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "startThreshold": {
+                    "description": "Turn-on (VCC rising) threshold, in volts.",
+                    "type": "number"
+                },
+                "stopThreshold": {
+                    "description": "Turn-off (VCC falling) threshold, in volts.",
+                    "type": "number"
+                },
+                "side": {
+                    "description": "Which rail the UVLO monitors. 'input' = VCC/VCCI (controller/primary-logic side); 'output' = driver-output supply; 'floating' = bootstrapped high-side rail.",
+                    "type": "string",
+                    "enum": [
+                        "input",
+                        "output",
+                        "floating"
+                    ]
+                },
+                "selectableOptions": {
+                    "description": "Pin-/option-selectable UVLO threshold set, in volts (e.g. [8, 12] for a VDD-OFF-selectable driver).",
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "minItems": 1
+                }
+            }
+        },
+        "isolationRating": {
+            "description": "Galvanic-isolation barrier rating (isolated gate drivers, isolated amplifiers, digital isolators, opto feedback). Absent on non-isolated parts.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "isolationType": {
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "functional",
+                        "basic",
+                        "reinforced",
+                        "double"
+                    ]
+                },
+                "withstandVoltageRms": {
+                    "description": "1-minute withstand (VISO), in volts RMS.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "workingVoltage": {
+                    "description": "Maximum repetitive working isolation voltage (VIORM, peak), in volts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "surgeVoltage": {
+                    "description": "Surge isolation voltage (VIOSM), in volts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "cmti": {
+                    "description": "Common-mode transient immunity, in volts per second (UCC21520 125e9 = 125 V/ns).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "barrierCapacitance": {
+                    "description": "Barrier capacitance, in farads.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "creepage": {
+                    "description": "External creepage across the package, in metres.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "clearance": {
+                    "description": "External clearance across the package, in metres.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "senseAmplifier": {
+            "description": "Current-sense / isolated amplifier (and isolated delta-sigma modulator) characteristics. Used by currentSenseAmplifier and isolatedAmplifier categories; outputFormat distinguishes analog amps from bitstream isolated ADCs (AMC1306).",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "gain": {
+                    "description": "Fixed voltage gain, in V/V.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "gainOptions": {
+                    "description": "Selectable gain set, in V/V (INA240 20/50/100/200).",
+                    "type": "array",
+                    "items": {
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "minItems": 1
+                },
+                "gainErrorMax": {
+                    "description": "Maximum gain error, as a fraction.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "inputOffsetVoltage": {
+                    "description": "Maximum input offset voltage, in volts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "cmrr": {
+                    "description": "Common-mode rejection ratio, in dB.",
+                    "type": "number"
+                },
+                "bandwidth": {
+                    "description": "Signal bandwidth, in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "commonModeRange": {
+                    "description": "Input common-mode voltage range, in volts (INA240 -4..80 V).",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "inputVoltageRange": {
+                    "description": "Full-scale differential input range, in volts (AMC1301 +/-0.25 V).",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "bidirectional": {
+                    "description": "True if it senses both current directions.",
+                    "type": "boolean"
+                },
+                "outputFormat": {
+                    "description": "Output representation. Bitstream formats mark isolated delta-sigma modulators (AMC1306) versus analog isolated amps.",
+                    "type": "string",
+                    "enum": [
+                        "analog",
+                        "bitstreamCmos",
+                        "bitstreamManchester",
+                        "spi"
+                    ]
+                },
+                "signalToNoiseRatio": {
+                    "description": "SNR, in dB (delta-sigma modulators).",
+                    "type": "number"
+                }
+            }
+        },
+        "shuntReference": {
+            "description": "Adjustable shunt regulator (TL431-class) characteristics. The cathode-current window and dynamic impedance are the defining specs; the device is usually the secondary-side loop error amplifier.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "minCathodeCurrent": {
+                    "description": "Minimum cathode current for regulation, in amperes (TL431 ~250 uA).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "maxCathodeCurrent": {
+                    "description": "Maximum cathode current, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "dynamicImpedance": {
+                    "description": "Cathode dynamic impedance, in ohms (TL431 ~0.2 ohm).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "adjustableRange": {
+                    "description": "Programmable output (cathode) voltage range, in volts.",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                }
+            }
+        },
+        "voltageReference": {
+            "description": "Series / shunt voltage-reference precision specs (voltageReference category). referenceVoltage / referenceTolerance live in the common electrical block; this block carries the second-order precision specs.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "tempco": {
+                    "description": "Temperature coefficient, in ppm/degC.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "outputNoise": {
+                    "description": "Output noise (0.1-10 Hz), in volts peak-to-peak.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "longTermDrift": {
+                    "description": "Long-term drift, in ppm per 1000 hours.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "lineRegulation": {
+                    "description": "Line regulation, in volts per volt.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "loadRegulation": {
+                    "description": "Load regulation, in volts per ampere.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "outputCurrent": {
+                    "description": "Rated output current for series references, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "dropoutVoltage": {
+                    "description": "Headroom / dropout for series references, in volts.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "hotSwap": {
+            "description": "Hot-swap / eFuse front-end characteristics (hotSwapController, eFuse). Carries the fast circuit-breaker, the slow SOA power limit, and the fault-response variant axis that a protections[] OCP row cannot express together.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "currentLimit": {
+                    "description": "Active current-limit set point, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "circuitBreakerThreshold": {
+                    "description": "Fast circuit-breaker sense-voltage threshold, in volts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "powerLimit": {
+                    "description": "SOA power-limit set point, in watts (LM5066).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "faultTimer": {
+                    "description": "Fault (insertion / overload) timer, in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "onResistance": {
+                    "description": "Integrated FET on-resistance, in ohms (eFuse).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "overvoltageClampVoltage": {
+                    "description": "Output overvoltage clamp, in volts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "inrushSlewRate": {
+                    "description": "Programmed output dV/dt during inrush, in volts per second.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "reverseBlocking": {
+                    "description": "True if reverse-current blocking is supported.",
+                    "type": "boolean"
+                },
+                "faultResponse": {
+                    "description": "Device-level fault behaviour variant.",
+                    "type": "string",
+                    "enum": [
+                        "autoRetry",
+                        "latchOff",
+                        "autoRetryThermalOnly"
+                    ]
+                },
+                "currentMonitorGain": {
+                    "description": "Analog current-monitor (IMON) transfer gain, in volts per ampere.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "vdsOcpThreshold": {
+                    "description": "External-FET VDS-sense overcurrent threshold, in volts (smart-driver / hot-swap FET protection).",
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "syncRectifier": {
+            "description": "Synchronous-rectifier controller VDS-sensing characteristics (syncRectifierController). The negative turn-on / near-zero turn-off VDS thresholds are the defining specs.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "turnOnThreshold": {
+                    "description": "VDS turn-on threshold, in volts (negative, ~ -150 mV class).",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "turnOffThreshold": {
+                    "description": "VDS turn-off threshold, in volts (near 0, slightly negative).",
+                    "type": "number"
+                },
+                "proportionalGateDrive": {
+                    "description": "True if the SR gate drive is proportional to conduction.",
+                    "type": "boolean"
+                },
+                "ccmCycleLimit": {
+                    "description": "True if a CCM cycle-limit / pre-turn-off prevents shoot-through in continuous conduction.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "burstMode": {
+            "description": "Light-load burst / standby characteristics (LLC, flyback).",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "entryThreshold": {
+                    "description": "Feedback voltage at which burst mode is entered, in volts.",
+                    "type": "number"
+                },
+                "exitThreshold": {
+                    "description": "Feedback voltage at which burst mode is exited, in volts.",
+                    "type": "number"
+                },
+                "programmable": {
+                    "description": "True if the burst threshold is externally programmable.",
+                    "type": "boolean"
+                },
+                "standbyPower": {
+                    "description": "Typical no-load / standby input power, in watts.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "brownOut": {
+            "description": "Bulk-/line-voltage brown-in / brown-out monitor (distinct from VCC UVLO; thresholds are in bulk-node volts).",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "threshold": {
+                    "description": "Brown-out (falling) threshold at the monitored node, in volts.",
+                    "type": "number"
+                },
+                "hysteresis": {
+                    "description": "Brown-in/out hysteresis, in volts.",
+                    "type": "number"
+                }
+            }
+        },
+        "pfc": {
+            "description": "PFC control-strategy parameters (pfcController). The multiplier / line-feedforward path defines the current reference for behavioural PFC simulation.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "multiplierInput": {
+                    "description": "True if the part uses an analog multiplier (Vline x Vea) to shape the current reference.",
+                    "type": "boolean"
+                },
+                "lineFeedforward": {
+                    "description": "True if input-voltage feedforward is implemented.",
+                    "type": "boolean"
+                },
+                "frequencyFoldbackFloor": {
+                    "description": "Current-controlled frequency-foldback (CCFF) clamp floor, in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "valleySwitching": {
+                    "description": "True if quasi-resonant valley turn-on is used (CrM/transition PFC).",
+                    "type": "boolean"
+                }
+            }
+        },
+        "loadLine": {
+            "description": "Output load-line / droop characteristics (multiphase VR controllers).",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "slope": {
+                    "description": "Load-line slope, in ohms (V/A).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "programmable": {
+                    "description": "True if the load-line slope is configurable.",
+                    "type": "boolean"
+                },
+                "dcrSenseSupported": {
+                    "description": "True if inductor-DCR current sense is supported.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "synchronization": {
+            "description": "Inter-chip clock synchronization (distinct from intra-chip interleaving). Lets a stencil set the relative phase of paralleled converters.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "masterOnly",
+                        "slaveOnly",
+                        "masterSlave",
+                        "externalClockIn",
+                        "none"
+                    ]
+                },
+                "frequencyMultiplier": {
+                    "description": "Sync-pulse frequency relative to switching frequency (e.g. 2 for a 2x sync clock).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "phaseShift": {
+                    "description": "Phase shift applied when synced, in degrees.",
+                    "type": "number"
+                }
+            }
+        },
+        "integratedPowerStage": {
+            "description": "Pointer to the integrated power FET(s) for GaN/Si power-stage ICs (driver + FET). CTAS owns only the driver/protection half; the FET physics (RDS(on), VDS, Coss, Qg, avalanche) live in SAS and are referenced, never duplicated.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "semiconductorRef": {
+                    "description": "Identifier of the SAS semiconductor record describing the integrated FET(s).",
+                    "type": "string"
+                },
+                "switchCount": {
+                    "description": "Number of integrated power switches (1 for a single GaN FET, 2 for a half-bridge stage).",
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
+        "protection": {
+            "description": "One on-die protection event with its threshold, recovery mode and (optionally) response time and the rail it monitors.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "kind"
+            ],
+            "properties": {
+                "kind": {
+                    "$ref": "./utils.json#/$defs/controllerProtectionKind"
+                },
+                "threshold": {
+                    "description": "Trip threshold in native units of the monitored quantity (V for voltage-class, A for current-class, degC for temperature, fraction for duty-class).",
+                    "type": "number"
+                },
+                "hysteresis": {
+                    "description": "Hysteresis, in the same units as threshold.",
+                    "type": "number"
+                },
+                "mode": {
+                    "$ref": "./utils.json#/$defs/protectionMode"
+                },
+                "restartDelay": {
+                    "description": "Auto-restart / hiccup delay before re-engagement, in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "responseTime": {
+                    "description": "Trip-to-action response time, in seconds (fast OCP / desat / eFuse, < 100 ns class).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "rail": {
+                    "description": "Which rail/node the event monitors (disambiguates OVP/UVP without doubling the kind enum).",
+                    "type": "string",
+                    "enum": [
+                        "input",
+                        "output",
+                        "bias"
+                    ]
+                }
+            }
+        },
+        "pin": {
+            "description": "One pin of the controller. The (number, name, function) triple is canonical and unique within a part.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "number",
+                "name",
+                "function"
+            ],
+            "properties": {
+                "number": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "function": {
+                    "$ref": "./utils.json#/$defs/controllerPinFunction"
+                }
+            }
+        },
+        "digitalInterface": {
+            "description": "Digital communication + configuration interface (digital / PMBus / programmable parts). A part with no digital interface omits this object.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "i2c",
+                        "smbus",
+                        "pmbus",
+                        "svid",
+                        "spi",
+                        "uart",
+                        "avsbus"
+                    ]
+                },
+                "maxClock": {
+                    "description": "Maximum interface clock, in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "revision": {
+                    "description": "Interface specification revision (e.g. PMBus '1.3.1').",
+                    "type": "string"
+                },
+                "address": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "default": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "strapPinCount": {
+                            "description": "Number of strap pins used to set the address.",
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    }
+                },
+                "configurableViaNvm": {
+                    "description": "True if device behaviour (setpoints, loop, sequencing) is configured by writing non-volatile memory.",
+                    "type": "boolean"
+                },
+                "nonvolatileConfig": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "none",
+                                "otp",
+                                "eeprom",
+                                "flash",
+                                "mtp"
+                            ]
+                        },
+                        "sizeBytes": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    }
+                },
+                "telemetry": {
+                    "description": "Telemetry channels reported over the interface (PMBus READ_* map 1:1).",
+                    "type": "array",
+                    "items": {
+                        "$ref": "./utils.json#/$defs/telemetryChannel"
+                    },
+                    "uniqueItems": true
+                },
+                "vidDac": {
+                    "description": "Voltage-identification DAC (VR/IMVP digital controllers). Replaces a fixed referenceVoltage for VID-controlled parts.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "resolutionBits": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "stepVoltageOptions": {
+                            "description": "Selectable VID step sizes, in volts.",
+                            "type": "array",
+                            "items": {
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "minItems": 1
+                        },
+                        "rangeMin": {
+                            "type": "number"
+                        },
+                        "rangeMax": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "digitalControl": {
+                    "description": "Programmable digital control-loop resources (digital controllers, UCD3138 / XDPP1100 / ADP1055).",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "loopFilterType": {
+                            "type": "string",
+                            "enum": [
+                                "pid",
+                                "twoPoleTwoZero",
+                                "threePoleThreeZero",
+                                "stateMachine",
+                                "programmableFirmware"
+                            ]
+                        },
+                        "errorAdcResolutionBits": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "dpwmResolutionSeconds": {
+                            "description": "DPWM time resolution, in seconds (UCD3138 250e-12).",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "maxPwmOutputs": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "maxVoltageLoops": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "processorCore": {
+                            "description": "On-die processor core, if any (e.g. 'ARM Cortex-M0', 'proprietary').",
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "thermal": {
+            "description": "Thermal data. Extends the shared datasheetInfoThermal (operatingTemperature) with the junction-temperature limit and the package thermal resistances a controller datasheet publishes.",
+            "allOf": [
+                {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/datasheetInfoThermal"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "operatingTemperature": {},
+                        "maximumJunctionTemperature": {
+                            "description": "Absolute-maximum junction temperature, in degC.",
+                            "type": "number"
+                        },
+                        "thetaJA": {
+                            "description": "Junction-to-ambient thermal resistance, in K/W.",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "thetaJC": {
+                            "description": "Junction-to-case thermal resistance, in K/W.",
+                            "type": "number",
+                            "minimum": 0
+                        }
+                    },
+                    "unevaluatedProperties": false
+                }
+            ]
+        },
+        "mechanical": {
+            "description": "Mechanical package data. Extends the shared datasheetInfoMechanical (length/width/height/weight) with the IC package code and assembly type. pinCount is intentionally NOT stored (derive from pins[]).",
+            "allOf": [
+                {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/datasheetInfoMechanical"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "length": {},
+                        "width": {},
+                        "height": {},
+                        "diameter": {},
+                        "weight": {},
+                        "packageType": {
+                            "$ref": "./utils.json#/$defs/packageType"
+                        },
+                        "assemblyType": {
+                            "$ref": "https://psma.com/peas/utils.json#/$defs/connectionType"
+                        }
+                    },
+                    "unevaluatedProperties": false
+                }
+            ]
+        },
+        "compliance": {
+            "description": "Qualification and regulatory compliance. Replaces the former (dangling) business $ref. complianceTargets reuse the PEAS shared complianceTarget primitive.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "aecQGrade": {
+                    "description": "AEC-Q100 grade, if automotive-qualified.",
+                    "type": "string",
+                    "enum": [
+                        "Q100-G0",
+                        "Q100-G1",
+                        "Q100-G2",
+                        "Q100-G3",
+                        "Q101"
+                    ]
+                },
+                "moistureSensitivityLevel": {
+                    "description": "JEDEC J-STD-020 MSL.",
+                    "type": "string",
+                    "enum": [
+                        "1",
+                        "2",
+                        "2a",
+                        "3",
+                        "4",
+                        "5",
+                        "5a",
+                        "6"
+                    ]
+                },
+                "rohsCompliant": {
+                    "type": "boolean"
+                },
+                "reachCompliant": {
+                    "type": "boolean"
+                },
+                "complianceTargets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://psma.com/peas/utils.json#/$defs/complianceTarget"
+                    }
+                }
+            }
+        }
+    }
+}

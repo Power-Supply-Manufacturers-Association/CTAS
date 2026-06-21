@@ -1,0 +1,170 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://psma.com/ctas/inputs/designRequirements.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "title": "designRequirements",
+    "description": "What a design needs from a controller — the pre-librarian SEED. Built on the PEAS designRequirementsBase mixin (name / role / market / topology / operatingTemperature / terminalType / maximumDimensions). The librarian uses it as the search constraint to bind a real part and retains it post-binding as the spec the part met. `category` is always required; for switching-converter categories `topology` (the intended converter topology, from the base) and `switchingFrequency` are additionally required so an ideal behavioural switch model can be instantiated from the seed alone.",
+    "allOf": [
+        {
+            "$ref": "https://psma.com/peas/utils.json#/$defs/designRequirementsBase"
+        },
+        {
+            "type": "object",
+            "required": [
+                "category"
+            ],
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "category": {
+                                "enum": [
+                                    "pwmController",
+                                    "multiphaseController",
+                                    "llcController",
+                                    "pfcController",
+                                    "dualPwmController",
+                                    "phaseShiftController",
+                                    "syncRectifierController",
+                                    "digitalController"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "category"
+                        ]
+                    },
+                    "then": {
+                        "required": [
+                            "topology",
+                            "switchingFrequency"
+                        ]
+                    }
+                }
+            ],
+            "properties": {
+                "category": {
+                    "description": "Required functional category of the controller (the discriminator).",
+                    "$ref": "https://psma.com/ctas/utils.json#/$defs/controllerCategory"
+                },
+                "modulation": {
+                    "$ref": "https://psma.com/ctas/utils.json#/$defs/controllerModulation"
+                },
+                "conductionMode": {
+                    "$ref": "https://psma.com/ctas/utils.json#/$defs/controllerConductionMode"
+                },
+                "channelCount": {
+                    "description": "Required number of independent regulation channels.",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "phaseCount": {
+                    "description": "Required number of interleaved power phases on a single rail (multiphase VR). Distinct from channelCount, which counts independent rails.",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "syncRectification": {
+                    "$ref": "https://psma.com/ctas/utils.json#/$defs/controllerSyncRectification"
+                },
+                "isolation": {
+                    "$ref": "https://psma.com/ctas/utils.json#/$defs/controllerIsolation"
+                },
+                "isolationRatingRmsMin": {
+                    "description": "Minimum required barrier withstand voltage, in volts RMS (isolated parts).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "cmtiMin": {
+                    "description": "Minimum required common-mode transient immunity, in volts per second (isolated drivers).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "supplyVoltageAvailable": {
+                    "description": "Bias-rail (VCC) voltage range the design can offer, in volts.",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "switchingFrequency": {
+                    "description": "Switching-frequency range the design needs the controller to support, in Hz. The chosen part's electrical.switchingFrequencyMin..Max must contain this interval. Required for switching-converter categories.",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "minimumGateDriveCurrent": {
+                    "description": "Peak gate-drive current the controller must source/sink, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "maximumQuiescentCurrent": {
+                    "description": "Upper bound on the controller's quiescent supply current, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "maximumStandbyPower": {
+                    "description": "Upper bound on no-load / standby input power for offline parts, in watts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "requiredProtections": {
+                    "description": "Protections the controller must implement on-die.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://psma.com/ctas/utils.json#/$defs/controllerProtectionKind"
+                    },
+                    "uniqueItems": true
+                },
+                "digitalInterfaceRequired": {
+                    "description": "Required digital interface, if any.",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "i2c",
+                        "smbus",
+                        "pmbus",
+                        "svid",
+                        "spi",
+                        "uart",
+                        "avsbus"
+                    ]
+                },
+                "requiredTelemetry": {
+                    "description": "Telemetry channels the controller must report (meaningful only when digitalInterfaceRequired is not 'none').",
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://psma.com/ctas/utils.json#/$defs/telemetryChannel"
+                    },
+                    "uniqueItems": true
+                },
+                "aecQGrade": {
+                    "description": "Required AEC-Q100 grade, if automotive.",
+                    "type": "string",
+                    "enum": [
+                        "Q100-G0",
+                        "Q100-G1",
+                        "Q100-G2",
+                        "Q100-G3",
+                        "Q101"
+                    ]
+                },
+                "controlConfigSeed": {
+                    "description": "Loop-shaping target for an ideal behavioural simulation of a (usually digital) controller, before a real part is bound. A firmware/configuration target, NOT part data.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "targetOutputVoltage": {
+                            "description": "Regulation target, in volts.",
+                            "type": "number"
+                        },
+                        "crossoverFrequency": {
+                            "description": "Target loop crossover frequency, in Hz.",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "phaseMargin": {
+                            "description": "Target phase margin, in degrees.",
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "unevaluatedProperties": false
+}

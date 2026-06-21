@@ -1,0 +1,117 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://psma.com/ctas/outputs.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "title": "outputs",
+    "description": "Results computed for one operating point of a controller. Each block is independently optional and carries the PEAS outputBase {origin, methodUsed} provenance shell. outputs[i] aligns positionally with inputs.operatingPoints[i]. Controllers are mostly SELECTED rather than simulated, so the output surface is deliberately small: the controller's own bias dissipation and resulting junction temperature, plus a selection-margin block recording how the bound part met the seed.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+        "biasLoss": {
+            "description": "The controller's own power dissipation at this operating point.",
+            "$ref": "#/$defs/biasLossOutput"
+        },
+        "thermal": {
+            "description": "Junction temperature reached under the bias dissipation.",
+            "$ref": "#/$defs/thermalOutput"
+        },
+        "selection": {
+            "description": "How the bound part met the design-requirements seed.",
+            "$ref": "#/$defs/selectionOutput"
+        }
+    },
+    "$defs": {
+        "biasLossOutput": {
+            "title": "biasLossOutput",
+            "allOf": [
+                {
+                    "$ref": "https://psma.com/peas/outputs/outputBase.json"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "origin": {},
+                        "methodUsed": {},
+                        "quiescentLoss": {
+                            "description": "VCC * Iq dissipation, in W.",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "gateDriveLoss": {
+                            "description": "Gate-charge driving loss in the controller's output stage, in W.",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "totalLoss": {
+                            "description": "Total controller dissipation, in W.",
+                            "type": "number",
+                            "minimum": 0
+                        }
+                    },
+                    "required": [
+                        "totalLoss"
+                    ],
+                    "unevaluatedProperties": false
+                }
+            ]
+        },
+        "thermalOutput": {
+            "title": "thermalOutput",
+            "allOf": [
+                {
+                    "$ref": "https://psma.com/peas/outputs/outputBase.json"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "origin": {},
+                        "methodUsed": {},
+                        "junctionTemperature": {
+                            "description": "Predicted junction temperature, in degC.",
+                            "type": "number"
+                        },
+                        "passes": {
+                            "description": "True if junctionTemperature is within the part's maximumJunctionTemperature.",
+                            "type": "boolean"
+                        }
+                    },
+                    "required": [
+                        "junctionTemperature"
+                    ],
+                    "unevaluatedProperties": false
+                }
+            ]
+        },
+        "selectionOutput": {
+            "title": "selectionOutput",
+            "allOf": [
+                {
+                    "$ref": "https://psma.com/peas/outputs/outputBase.json"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "origin": {},
+                        "methodUsed": {},
+                        "switchingFrequencyMargin": {
+                            "description": "Fractional headroom of the part's frequency range around the required interval.",
+                            "type": "number"
+                        },
+                        "protectionsSatisfied": {
+                            "description": "True if every requiredProtection is present on the part.",
+                            "type": "boolean"
+                        },
+                        "passes": {
+                            "type": "boolean"
+                        }
+                    },
+                    "required": [
+                        "passes"
+                    ],
+                    "unevaluatedProperties": false
+                }
+            ]
+        }
+    }
+}

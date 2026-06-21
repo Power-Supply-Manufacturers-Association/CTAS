@@ -1,0 +1,54 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://psma.com/ctas/inputs.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "title": "inputs",
+    "description": "Inputs used to select or evaluate a controller. Mirrors the MAS / CAS / RAS / CONAS inputs structure: a required designRequirements seed plus optional operatingPoints (the converter operating conditions under which the controller's own bias loss / junction temperature are evaluated). outputs[i] aligns positionally with operatingPoints[i].",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "designRequirements"
+    ],
+    "properties": {
+        "designRequirements": {
+            "$ref": "./inputs/designRequirements.json"
+        },
+        "operatingPoints": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/operatingPoint"
+            }
+        }
+    },
+    "$defs": {
+        "operatingPoint": {
+            "description": "One converter operating condition relevant to the controller's own dissipation and thermal state.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "ambientTemperature": {
+                    "description": "Ambient temperature, in degC.",
+                    "type": "number"
+                },
+                "supplyVoltage": {
+                    "description": "Bias-rail (VCC) voltage at this point, in volts.",
+                    "type": "number"
+                },
+                "switchingFrequency": {
+                    "description": "Switching frequency at this point, in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "loadFraction": {
+                    "description": "Converter load as a fraction of full load (0..1), for light-load / standby points.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                }
+            }
+        }
+    }
+}
