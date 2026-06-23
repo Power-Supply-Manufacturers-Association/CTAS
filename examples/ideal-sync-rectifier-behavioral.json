@@ -1,0 +1,20 @@
+{
+    "inputs": {
+        "designRequirements": {
+            "name": "ideal synchronous-rectifier control block (behavioural model, not a catalog part)",
+            "category": "syncRectifierController"
+        }
+    },
+    "controller": {
+        "behavioral": {
+            "controlScheme": "synchronousRectifier",
+            "sensing": "current",
+            "topology": "fullBridge",
+            "hysteresis": 0.005,
+            "driveHigh": 5.0,
+            "driveLow": 0.0,
+            "threshold": 0.0
+        }
+    },
+    "outputs": []
+}

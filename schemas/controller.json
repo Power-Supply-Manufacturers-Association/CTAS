@@ -23,9 +23,53 @@
             "items": {
                 "$ref": "https://psma.com/peas/utils.json#/$defs/substituteInfo"
             }
+        },
+        "behavioral": {
+            "$ref": "#/$defs/behavioral"
         }
     },
     "$defs": {
+        "behavioral": {
+            "title": "controllerBehavioral",
+            "description": "Simulator-agnostic IDEAL behavioural model of the controller's CONTROL LAW, for circuit simulation — distinct from the datasheet `electrical` capability sub-objects (which describe a resolved real part). Present on an otherwise part-less document to describe an ideal control block that a simulator backend realises (e.g. as a network of comparators). The shape is keyed by controlScheme; only synchronousRectifier is defined so far (additive as more laws are modelled).",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "controlScheme": {
+                    "description": "Which ideal control law this block realises.",
+                    "type": "string",
+                    "enum": [ "synchronousRectifier" ]
+                },
+                "sensing": {
+                    "description": "What the controller senses to commutate the rectifier. current = the secondary/tank current sign through a sense element (the robust choice for resonant converters); drainSource = each SR switch's Vds (per-switch body-diode emulation).",
+                    "type": "string",
+                    "enum": [ "current", "drainSource" ]
+                },
+                "topology": {
+                    "description": "Rectifier bridge topology the controller drives.",
+                    "type": "string",
+                    "enum": [ "fullBridge", "halfBridge", "centerTapped" ]
+                },
+                "hysteresis": {
+                    "description": "Comparator hysteresis half-width on the sensed signal, in V. 0 (or absent) is an ideal zero-hysteresis commutation.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "driveHigh": {
+                    "description": "Gate-drive high-rail voltage, in V.",
+                    "type": "number"
+                },
+                "driveLow": {
+                    "description": "Gate-drive low-rail voltage, in V.",
+                    "type": "number"
+                },
+                "threshold": {
+                    "description": "Commutation threshold on the sensed signal, in V.",
+                    "type": "number"
+                }
+            },
+            "required": [ "controlScheme" ]
+        },
         "manufacturerInfo": {
             "description": "Identity of the resolved real part plus its parametric catalog block (datasheetInfo). Mirrors the CAS / CONAS nesting (datasheetInfo lives under manufacturerInfo).",
             "type": "object",

@@ -59,6 +59,10 @@ CTAS  (https://psma.com/ctas/CTAS.json)   { inputs, controller, outputs }
 
 `*` = required. An empty `controller: {}` is a valid pre-librarian seed (carry the spec in `inputs.designRequirements`); a resolved part carries `manufacturerInfo` (which requires `name` + `datasheetInfo`, and `datasheetInfo` requires `function`, and `function` requires `category`).
 
+## Ideal behavioural model (`controller.behavioral`)
+
+Separate from the datasheet `electrical` capability sub-objects (which describe a *resolved real part*), a controller may carry an optional, simulator-agnostic **`behavioral`** block describing an *ideal* control LAW for circuit simulation. It is keyed by `controlScheme` (required); only `synchronousRectifier` is defined so far. For the SR scheme: `sensing` (`current` = secondary/tank-current sign via a sense element — the robust choice for resonant converters; `drainSource` = per-switch Vds body-diode emulation), `topology` (fullBridge/halfBridge/centerTapped), `hysteresis` (half-width on the sensed signal), `driveHigh`/`driveLow` (gate-drive rails), `threshold`. A document may carry `behavioral` **without** `manufacturerInfo` (an ideal block, not a catalog part); a simulator backend realises it as a small network of comparators. See `examples/ideal-sync-rectifier-behavioral.json`. The mirror on the analog side is `AAS comparator.behavioral`.
+
 ## Which capability sub-object belongs to which category
 
 | Sub-object (`electrical.*`) | Populated for | Carries (headline) |
