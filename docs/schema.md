@@ -103,3 +103,11 @@ python3 scripts/validate.py
 ```
 
 Three gates: schema meta-validation + **full `$ref` resolution** (catches dangling refs); `examples/*.json` vs `CTAS.json`; PEAS citizenship. In the TAS workspace, `TAS/data/controllers.ndjson` records (each a `{ "controller": { … } }` wrap) are validated against `controller.json` by `TAS/tests/test_data.py`.
+
+## Provenance (data-source trail)
+
+`datasheetInfo.provenance` is an optional array recording where the controller's data came
+from (one entry per source; a record may mix sources). Each entry: `source`
+(`manufacturerDatasheet`/`manufacturerParametric`/`manufacturerDatabase`/`distributor`/
+`librarianEnrichment`/`scrape`/`manual`), `sourceName`, optional `sourceUrl`, `retrievedDate`,
+and optional `fields[]`. Canonical definition: `PEAS/schemas/utils.json#/$defs/provenance`.
