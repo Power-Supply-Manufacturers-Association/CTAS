@@ -23,7 +23,7 @@ PSMA = os.path.dirname(HERE)
 
 def load_all():
     resources = []
-    for repo in ("PEAS", "MAS", "CAS", "SAS", "RAS", "CONAS", "CTAS"):
+    for repo in ("PEAS", "MAS", "CAS", "SAS", "RAS", "CONAS", "CTAS", "AAS", "TAS", "CIAS", "COAS"):
         pat = os.path.join(PSMA, repo, "schemas", "**", "*.json")
         for f in glob.glob(pat, recursive=True):
             try:
@@ -107,7 +107,8 @@ def main():
             else:
                 print(f"  citizenship OK (valid PEAS): {os.path.basename(f)}")
     except Exception as exc:  # noqa: BLE001
-        print(f"  citizenship SKIPPED (PEAS not resolvable): {exc}")
+        errors += 1
+        print(f"\nFAIL: citizenship gate cannot run (PEAS not resolvable): {exc}")
 
     print("\n" + ("PASS" if errors == 0 else f"FAIL ({errors} errors)"))
     sys.exit(1 if errors else 0)

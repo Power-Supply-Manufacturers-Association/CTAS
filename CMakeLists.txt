@@ -21,3 +21,13 @@ target_include_directories(CTAS PUBLIC
     src
     "${CMAKE_CURRENT_SOURCE_DIR}/../PEAS/src")    # Fidelity.hpp
 target_link_libraries(CTAS PUBLIC nlohmann_json::nlohmann_json)
+
+# --- Catch2 unit tests (house standard: run ./build/ctas_tests directly, never ctest). ---
+option(CTAS_BUILD_TESTS "Build CTAS unit tests" ON)
+if (CTAS_BUILD_TESTS AND NOT EMSCRIPTEN)
+    FetchContent_Declare(Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git GIT_TAG v3.8.1)
+    FetchContent_MakeAvailable(Catch2)
+    add_executable(ctas_tests tests/test_ctas.cpp)
+    target_link_libraries(ctas_tests PRIVATE CTAS Catch2::Catch2WithMain)
+endif()

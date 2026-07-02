@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://psma.com/ctas/CTAS.json",
-    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "$comment": "SPDX-License-Identifier: MIT",
     "title": "CTAS",
     "description": "Controller Agnostic Structure (CTAS). A document carries inputs, exactly one 'controller' component, and outputs. Like CONAS (and unlike SAS/RAS, which discriminate device type at the top level), CTAS keeps a single 'controller' field and discriminates the functional class internally on controller.manufacturerInfo.datasheetInfo.function.category, because the parametric core is shared across all controller categories and only category-gated capability sub-objects differ. Every valid CTAS document is also a valid PEAS document (the `controller` branch).",
     "type": "object",

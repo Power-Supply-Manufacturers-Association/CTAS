@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://psma.com/ctas/utils.json",
-    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "$comment": "SPDX-License-Identifier: MIT",
     "title": "utils",
     "description": "Controller-family-specific shared definitions for CTAS: the controlled vocabularies (category / modulation / conduction-mode / protection / pin-function / telemetry) and the controller package code. These are owned by CTAS, not PEAS, because no other component family uses them (CTAS follows the CONAS pattern: reuse the universal primitives from https://psma.com/peas/utils.json, own the family-specific enums here). Vocabularies derived from a datasheet survey of mainstream PWM / LLC / PFC / phase-shift / sync-rectifier / digital-PMBus controllers, isolated & non-isolated gate drivers, shunt regulators, voltage references, current-sense & isolated amplifiers, and hot-swap / eFuse controllers (TI, Analog Devices, onsemi, Infineon, ST, Renesas, Power Integrations).",
     "$defs": {
@@ -166,6 +166,7 @@
                 "syncRectifierGate",
                 "bootstrap",
                 "switchNode",
+                "logicInput",
                 "enable",
                 "syncIn",
                 "syncOut",

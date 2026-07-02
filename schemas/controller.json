@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://psma.com/ctas/controller.json",
-    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "$comment": "SPDX-License-Identifier: MIT",
     "title": "controller",
     "description": "Controller (control IC) component payload. ONE agnostic schema for every power-electronics control IC: PWM / multiphase / LLC-resonant / PFC / dual / phase-shift / sync-rectifier controllers, isolated & non-isolated gate drivers, digital/PMBus controllers, secondary-side & opto feedback, shunt regulators, voltage references, current-sense & isolated amplifiers, and hot-swap / eFuse controllers. function.category is the required discriminator; `electrical` is partitioned into optional CLOSED capability sub-objects that appear ONLY for the categories that use them (a TL431 carries shuntReference, never slopeCompensation) — this satisfies 'fewest fields / no redundancy / cover all cases' without a per-category oneOf explosion. The root is the unwrapped payload that PEAS references for its `controller` branch and that TAS validates each controllers.ndjson record against. An empty `{}` is a valid pre-librarian seed; a resolved part carries manufacturerInfo (which itself carries datasheetInfo). Field list derived from a datasheet survey of TI / Analog Devices / onsemi / Infineon / ST / Renesas / Power Integrations parts.",
     "type": "object",

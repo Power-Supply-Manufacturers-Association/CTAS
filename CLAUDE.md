@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository nature
 
-CTAS is a **schema-only repository** — no source code, no build, no application. It defines the **Controller Agnostic Structure**: a JSON Schema 2020-12 specification for power-electronics control ICs (PWM / multiphase / LLC / PFC / phase-shift / sync-rectifier controllers, isolated & non-isolated gate drivers, digital/PMBus controllers, shunt regulators, voltage references, current-sense & isolated amplifiers, hot-swap / eFuse controllers). Work here is editing JSON Schema files and Markdown docs.
+CTAS is primarily a **schema repository**, plus a small C++ lowering library (`src/CtasConverter.cpp`, `ctas_to_cias`) with Catch2 tests (`tests/`, build via CMake; run `./build/ctas_tests` directly, never ctest). It defines the **Controller Agnostic Structure**: a JSON Schema 2020-12 specification for power-electronics control ICs (PWM / multiphase / LLC / PFC / phase-shift / sync-rectifier controllers, isolated & non-isolated gate drivers, digital/PMBus controllers, shunt regulators, voltage references, current-sense & isolated amplifiers, hot-swap / eFuse controllers). Work here is editing JSON Schema files and Markdown docs.
 
 The only executable is `scripts/validate.py` (the validation gate). Run it after every schema change:
 

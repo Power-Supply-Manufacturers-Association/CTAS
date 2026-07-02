@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://psma.com/ctas/inputs.json",
-    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "$comment": "SPDX-License-Identifier: MIT",
     "title": "inputs",
     "description": "Inputs used to select or evaluate a controller. Mirrors the MAS / CAS / RAS / CONAS inputs structure: a required designRequirements seed plus optional operatingPoints (the converter operating conditions under which the controller's own bias loss / junction temperature are evaluated). outputs[i] aligns positionally with operatingPoints[i].",
     "type": "object",

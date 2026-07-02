@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://psma.com/ctas/outputs.json",
-    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "$comment": "SPDX-License-Identifier: MIT",
     "title": "outputs",
     "description": "Results computed for one operating point of a controller. Each block is independently optional and carries the PEAS outputBase {origin, methodUsed} provenance shell. outputs[i] aligns positionally with inputs.operatingPoints[i]. Controllers are mostly SELECTED rather than simulated, so the output surface is deliberately small: the controller's own bias dissipation and resulting junction temperature, plus a selection-margin block recording how the bound part met the seed.",
     "type": "object",

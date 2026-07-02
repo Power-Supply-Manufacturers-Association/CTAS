@@ -66,12 +66,34 @@ json ctas_to_cias(const json& peas, const PEAS::Fidelity& /*fidelity*/, const st
         throw std::runtime_error("ctas_to_cias: controller has no 'behavioral' block (only the ideal "
                                  "behavioural control law is lowered to CIAS so far)");
     const json& b = ctrl.at("behavioral");
-    const std::string scheme  = b.value("controlScheme", "synchronousRectifier");
-    const std::string sensing = b.value("sensing", "current");
-    const double hyst  = b.value("hysteresis", 5e-3);
-    const double vHigh = b.value("driveHigh", 5.0);
-    const double vLow  = b.value("driveLow", 0.0);
+    // No magic defaults: controlScheme is schema-required; sensing and the drive rails have no
+    // documented default and no universal value (the old value_or(5.0)/value_or(5e-3) silently
+    // fabricated a drive stage that contradicted both the schema and the CIAS realizer).
+    auto req_str = [&](const char* k) -> std::string {
+        if (!b.contains(k))
+            throw std::runtime_error("ctas_to_cias: behavioral block is missing required '" +
+                                     std::string(k) + "'");
+        return b.at(k).get<std::string>();
+    };
+    auto req_num = [&](const char* k) -> double {
+        if (!b.contains(k))
+            throw std::runtime_error("ctas_to_cias: behavioral block is missing '" +
+                                     std::string(k) + "' (no default drive rail exists)");
+        return b.at(k).get<double>();
+    };
+    const std::string scheme  = req_str("controlScheme");
+    const std::string sensing = req_str("sensing");
+    const double vHigh = req_num("driveHigh");
+    const double vLow  = req_num("driveLow");
+    // threshold: commutation point on the sensed signal; absent = 0 (sign crossing), matching
+    // the ideal-commutation semantics. hysteresis: schema documents "0 (or absent) is ideal".
     const double thr   = b.value("threshold", 0.0);
+    const double hyst  = b.value("hysteresis", 0.0);
+    if (hyst < 0.0)
+        throw std::runtime_error("ctas_to_cias: negative hysteresis");
+    // behavioral.topology (fullBridge/halfBridge/centerTapped) does not change the leaf: both
+    // realizations expose two commutation groups (gA/gB or gE..gH) and the TAS stage wiring maps
+    // them onto the actual rectifier switches. It is wiring metadata, not a realization input.
 
     if (scheme != "synchronousRectifier")
         throw std::runtime_error("ctas_to_cias: controlScheme '" + scheme + "' not supported yet");

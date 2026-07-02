@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://psma.com/ctas/inputs/designRequirements.json",
-    "$comment": "SPDX-License-Identifier: Apache-2.0",
+    "$comment": "SPDX-License-Identifier: MIT",
     "title": "designRequirements",
     "description": "What a design needs from a controller — the pre-librarian SEED. Built on the PEAS designRequirementsBase mixin (name / role / market / topology / operatingTemperature / terminalType / maximumDimensions). The librarian uses it as the search constraint to bind a real part and retains it post-binding as the spec the part met. `category` is always required; for switching-converter categories `topology` (the intended converter topology, from the base) and `switchingFrequency` are additionally required so an ideal behavioural switch model can be instantiated from the seed alone.",
     "allOf": [

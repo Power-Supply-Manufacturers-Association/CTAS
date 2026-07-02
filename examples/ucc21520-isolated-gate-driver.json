@@ -45,8 +45,8 @@
                         },
                         "negativeBiasMin": -5.0,
                         "propagationDelay": 1.9e-08,
-                        "propagationDelayMatching": 5.0e-09,
-                        "minPulseWidth": 2.0e-08,
+                        "propagationDelayMatching": 5e-09,
+                        "minPulseWidth": 2e-08,
                         "channelConfiguration": "halfBridge",
                         "interlock": true,
                         "deadTimeMode": "programmable"
@@ -85,7 +85,7 @@
                     {
                         "number": 1,
                         "name": "INA",
-                        "function": "enable"
+                        "function": "logicInput"
                     },
                     {
                         "number": 14,
