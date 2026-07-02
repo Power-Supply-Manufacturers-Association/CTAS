@@ -31,44 +31,230 @@
     "$defs": {
         "behavioral": {
             "title": "controllerBehavioral",
-            "description": "Simulator-agnostic IDEAL behavioural model of the controller's CONTROL LAW, for circuit simulation — distinct from the datasheet `electrical` capability sub-objects (which describe a resolved real part). Present on an otherwise part-less document to describe an ideal control block that a simulator backend realises (e.g. as a network of comparators). The shape is keyed by controlScheme; only synchronousRectifier is defined so far (additive as more laws are modelled).",
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "controlScheme": {
-                    "description": "Which ideal control law this block realises.",
-                    "type": "string",
-                    "enum": [ "synchronousRectifier" ]
+            "description": "Simulator-agnostic IDEAL behavioural model of the controller's CONTROL LAW, for circuit simulation — distinct from the datasheet `electrical` capability sub-objects (which describe a resolved real part). Present on an otherwise part-less document to describe an ideal control block that a simulator backend realises from behavioral atoms (AAS comparator/multiplier + TBAS oscillator/timer/latch, per PEAS-RFC 0001). A complete oneOf keyed by controlScheme: each scheme pins its discriminator with const and carries exactly the parameters its ctas_to_cias lowering consumes.",
+            "oneOf": [
+                {
+                    "description": "Synchronous-rectifier commutation: comparator on the sensed signal drives the SR gates.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "controlScheme": {
+                            "description": "Which ideal control law this block realises.",
+                            "type": "string",
+                            "const": "synchronousRectifier"
+                        },
+                        "sensing": {
+                            "description": "What the controller senses to commutate the rectifier. current = the secondary/tank current sign through a sense element (the robust choice for resonant converters); drainSource = each SR switch's Vds (per-switch body-diode emulation).",
+                            "type": "string",
+                            "enum": [ "current", "drainSource" ]
+                        },
+                        "topology": {
+                            "description": "Rectifier bridge topology the controller drives.",
+                            "type": "string",
+                            "enum": [ "fullBridge", "halfBridge", "centerTapped" ]
+                        },
+                        "hysteresis": {
+                            "description": "Comparator hysteresis half-width on the sensed signal, in V. 0 (or absent) is an ideal zero-hysteresis commutation.",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "driveHigh": {
+                            "description": "Gate-drive high-rail voltage, in V.",
+                            "type": "number"
+                        },
+                        "driveLow": {
+                            "description": "Gate-drive low-rail voltage, in V.",
+                            "type": "number"
+                        },
+                        "threshold": {
+                            "description": "Commutation threshold on the sensed signal, in V.",
+                            "type": "number"
+                        }
+                    },
+                    "required": [ "controlScheme" ]
                 },
-                "sensing": {
-                    "description": "What the controller senses to commutate the rectifier. current = the secondary/tank current sign through a sense element (the robust choice for resonant converters); drainSource = each SR switch's Vds (per-switch body-diode emulation).",
-                    "type": "string",
-                    "enum": [ "current", "drainSource" ]
+                {
+                    "description": "Voltage-mode PWM: error amplifier vs a fixed-frequency sawtooth ramp (TBAS oscillator) into a comparator that drives the gate.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "controlScheme": {
+                            "type": "string",
+                            "const": "voltageModePWM"
+                        },
+                        "switchingFrequency": {
+                            "description": "PWM ramp frequency, in Hz.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "rampAmplitude": {
+                            "description": "Sawtooth ramp peak amplitude, in V (sets the modulator gain 1/Vramp).",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "maximumDutyCycle": {
+                            "description": "Duty-cycle clamp, dimensionless fraction. Absent = unclamped ideal modulator.",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "exclusiveMaximum": 1
+                        },
+                        "driveHigh": {
+                            "description": "Gate-drive high-rail voltage, in V.",
+                            "type": "number"
+                        },
+                        "driveLow": {
+                            "description": "Gate-drive low-rail voltage, in V.",
+                            "type": "number"
+                        }
+                    },
+                    "required": [ "controlScheme", "switchingFrequency", "rampAmplitude" ]
                 },
-                "topology": {
-                    "description": "Rectifier bridge topology the controller drives.",
-                    "type": "string",
-                    "enum": [ "fullBridge", "halfBridge", "centerTapped" ]
+                {
+                    "description": "Peak-current-mode: clock (TBAS oscillator) sets the gate latch (TBAS latch, reset-dominant); comparator of sensed current + slope compensation vs the error voltage resets it.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "controlScheme": {
+                            "type": "string",
+                            "const": "peakCurrentMode"
+                        },
+                        "switchingFrequency": {
+                            "description": "Clock frequency, in Hz.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "currentSenseGain": {
+                            "description": "Sensed-current to comparator-voltage gain Ri, in V/A.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "slopeCompensation": {
+                            "description": "Compensation ramp slope added to the sensed signal, in V/s. Absent = no slope compensation (D < 0.5 designs).",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "maximumDutyCycle": {
+                            "description": "Duty-cycle clamp, dimensionless fraction. Absent = unclamped.",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "exclusiveMaximum": 1
+                        },
+                        "driveHigh": {
+                            "description": "Gate-drive high-rail voltage, in V.",
+                            "type": "number"
+                        },
+                        "driveLow": {
+                            "description": "Gate-drive low-rail voltage, in V.",
+                            "type": "number"
+                        }
+                    },
+                    "required": [ "controlScheme", "switchingFrequency", "currentSenseGain" ]
                 },
-                "hysteresis": {
-                    "description": "Comparator hysteresis half-width on the sensed signal, in V. 0 (or absent) is an ideal zero-hysteresis commutation.",
-                    "type": "number",
-                    "minimum": 0
+                {
+                    "description": "Constant-on-time: feedback comparator triggers a fixed on-time one-shot (TBAS timer, monostable, non-retriggerable).",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "controlScheme": {
+                            "type": "string",
+                            "const": "constantOnTime"
+                        },
+                        "onTime": {
+                            "description": "Fixed on-time, in s.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "minimumOffTime": {
+                            "description": "Minimum off-time before retrigger, in s. Absent = no off-time blanking.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "driveHigh": {
+                            "description": "Gate-drive high-rail voltage, in V.",
+                            "type": "number"
+                        },
+                        "driveLow": {
+                            "description": "Gate-drive low-rail voltage, in V.",
+                            "type": "number"
+                        }
+                    },
+                    "required": [ "controlScheme", "onTime" ]
                 },
-                "driveHigh": {
-                    "description": "Gate-drive high-rail voltage, in V.",
-                    "type": "number"
+                {
+                    "description": "Frequency modulation (LLC/resonant): error amplifier steers a VCO (TBAS oscillator with frequencyControl); two staggered comparators derive the complementary half-bridge gates with dead time.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "controlScheme": {
+                            "type": "string",
+                            "const": "frequencyControl"
+                        },
+                        "centerFrequency": {
+                            "description": "VCO free-running frequency, in Hz (typically near resonance).",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "vcoGain": {
+                            "description": "VCO gain, in Hz/V.",
+                            "type": "number"
+                        },
+                        "minimumFrequency": {
+                            "description": "Lower frequency clamp, in Hz.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "maximumFrequency": {
+                            "description": "Upper frequency clamp, in Hz.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "deadTime": {
+                            "description": "Complementary-drive dead time, in s.",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "driveHigh": {
+                            "description": "Gate-drive high-rail voltage, in V.",
+                            "type": "number"
+                        },
+                        "driveLow": {
+                            "description": "Gate-drive low-rail voltage, in V.",
+                            "type": "number"
+                        }
+                    },
+                    "required": [ "controlScheme", "centerFrequency", "vcoGain" ]
                 },
-                "driveLow": {
-                    "description": "Gate-drive low-rail voltage, in V.",
-                    "type": "number"
-                },
-                "threshold": {
-                    "description": "Commutation threshold on the sensed signal, in V.",
-                    "type": "number"
+                {
+                    "description": "PFC average-current-mode: multiplier (AAS) of rectified-line shape and voltage-loop error forms the current reference for the inner current loop.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "controlScheme": {
+                            "type": "string",
+                            "const": "pfcAverageCurrentMode"
+                        },
+                        "switchingFrequency": {
+                            "description": "Inner current-loop switching frequency, in Hz.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "currentSenseGain": {
+                            "description": "Sensed-current to control-voltage gain, in V/A.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "driveHigh": {
+                            "description": "Gate-drive high-rail voltage, in V.",
+                            "type": "number"
+                        },
+                        "driveLow": {
+                            "description": "Gate-drive low-rail voltage, in V.",
+                            "type": "number"
+                        }
+                    },
+                    "required": [ "controlScheme", "switchingFrequency", "currentSenseGain" ]
                 }
-            },
-            "required": [ "controlScheme" ]
+            ]
         },
         "manufacturerInfo": {
             "description": "Identity of the resolved real part plus its parametric catalog block (datasheetInfo). Mirrors the CAS / CONAS nesting (datasheetInfo lives under manufacturerInfo).",

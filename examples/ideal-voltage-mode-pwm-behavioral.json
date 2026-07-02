@@ -1,0 +1,23 @@
+{
+    "inputs": {
+        "designRequirements": {
+            "name": "ideal 100 kHz voltage-mode PWM law (behavioural model, not a catalog part)",
+            "category": "pwmController",
+            "topology": "buckConverter",
+            "switchingFrequency": {
+                "nominal": 100000.0
+            }
+        }
+    },
+    "controller": {
+        "behavioral": {
+            "controlScheme": "voltageModePWM",
+            "switchingFrequency": 100000.0,
+            "rampAmplitude": 1.0,
+            "maximumDutyCycle": 0.95,
+            "driveHigh": 10.0,
+            "driveLow": 0.0
+        }
+    },
+    "outputs": []
+}

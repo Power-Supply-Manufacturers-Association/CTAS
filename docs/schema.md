@@ -61,7 +61,16 @@ CTAS  (https://psma.com/ctas/CTAS.json)   { inputs, controller, outputs }
 
 ## Ideal behavioural model (`controller.behavioral`)
 
-Separate from the datasheet `electrical` capability sub-objects (which describe a *resolved real part*), a controller may carry an optional, simulator-agnostic **`behavioral`** block describing an *ideal* control LAW for circuit simulation. It is keyed by `controlScheme` (required); only `synchronousRectifier` is defined so far. For the SR scheme: `sensing` (`current` = secondary/tank-current sign via a sense element — the robust choice for resonant converters; `drainSource` = per-switch Vds body-diode emulation), `topology` (fullBridge/halfBridge/centerTapped), `hysteresis` (half-width on the sensed signal), `driveHigh`/`driveLow` (gate-drive rails), `threshold`. A document may carry `behavioral` **without** `manufacturerInfo` (an ideal block, not a catalog part); a simulator backend realises it as a small network of comparators. See `examples/ideal-sync-rectifier-behavioral.json`. The mirror on the analog side is `AAS comparator.behavioral`.
+Separate from the datasheet `electrical` capability sub-objects (which describe a *resolved real part*), a controller may carry an optional, simulator-agnostic **`behavioral`** block describing an *ideal* control LAW for circuit simulation. Since PEAS-RFC 0001 it is a complete `oneOf` keyed by `controlScheme` (each branch pins its discriminator with `const` and carries exactly the parameters its `ctas_to_cias` lowering consumes, built from AAS comparator/multiplier + TBAS oscillator/timer/latch atoms):
+
+- **`synchronousRectifier`** — `sensing` (`current` = secondary/tank-current sign via a sense element — the robust choice for resonant converters; `drainSource` = per-switch Vds body-diode emulation), `topology` (fullBridge/halfBridge/centerTapped), `hysteresis` (half-width on the sensed signal), `driveHigh`/`driveLow` (gate-drive rails), `threshold`.
+- **`voltageModePWM`** — `switchingFrequency`* (Hz), `rampAmplitude`* (V; modulator gain = 1/Vramp), `maximumDutyCycle`, `driveHigh`/`driveLow`.
+- **`peakCurrentMode`** — `switchingFrequency`* (Hz), `currentSenseGain`* (V/A), `slopeCompensation` (V/s; absent = none), `maximumDutyCycle`, `driveHigh`/`driveLow`.
+- **`constantOnTime`** — `onTime`* (s), `minimumOffTime` (s; absent = no blanking), `driveHigh`/`driveLow`.
+- **`frequencyControl`** (LLC/resonant FM) — `centerFrequency`* (Hz), `vcoGain`* (Hz/V), `minimumFrequency`/`maximumFrequency` (clamps), `deadTime` (s), `driveHigh`/`driveLow`.
+- **`pfcAverageCurrentMode`** — `switchingFrequency`* (Hz), `currentSenseGain`* (V/A), `driveHigh`/`driveLow`.
+
+(`*` = required in that branch.) A document may carry `behavioral` **without** `manufacturerInfo` (an ideal block, not a catalog part). See `examples/ideal-sync-rectifier-behavioral.json` and `examples/ideal-voltage-mode-pwm-behavioral.json`. The mirrors on the atom side are `AAS comparator.behavioral` and the TBAS behavioral blocks.
 
 ## Which capability sub-object belongs to which category
 
