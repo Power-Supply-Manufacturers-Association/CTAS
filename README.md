@@ -17,11 +17,12 @@ CTAS covers the whole control-IC space with **one** agnostic schema, discriminat
 | `secondaryFeedbackController` / `optocouplerFeedback` | UCC24650, opto loops |
 | `shuntRegulator` | TL431, TLV431 |
 | `voltageReference` | LM4040, REF5025 |
+| `linearRegulator` | LT3045, TPS7A47, TLV757P, NCP1117 |
 | `currentSenseAmplifier` / `isolatedAmplifier` | INA240, AMC1301, AMC1306 |
 | `hotSwapController` / `eFuse` / `loadSwitch` | LM5066, TPS25940, TPS22918 |
 | `supervisor` | TPS3700, UCD9090, ADM1266 (sequencer / voltage-monitor / watchdog) |
 
-The trick that keeps the field count low without losing coverage: the parametric core (`function` + the common `electrical` scalars) is shared across every category, and the category-specific data lives in **optional, closed capability sub-objects** under `electrical` (`currentMode`, `gateDrive`, `uvlo[]`, `isolation`, `senseAmplifier`, `shuntReference`, `voltageReference`, `hotSwap`, `syncRectifier`, `burstMode`, `brownOut`, `pfc`, `loadLine`, `synchronization`, `integratedPowerStage`). A TL431 carries `shuntReference` only; a UCC21520 carries `gateDrive` + `isolation` + `uvlo[]`; neither ever sees a field it cannot use.
+The trick that keeps the field count low without losing coverage: the parametric core (`function` + the common `electrical` scalars) is shared across every category, and the category-specific data lives in **optional, closed capability sub-objects** under `electrical` (`currentMode`, `gateDrive`, `uvlo[]`, `isolation`, `senseAmplifier`, `shuntReference`, `voltageReference`, `linearRegulator`, `hotSwap`, `syncRectifier`, `burstMode`, `brownOut`, `pfc`, `loadLine`, `synchronization`, `integratedPowerStage`). A TL431 carries `shuntReference` only; a UCC21520 carries `gateDrive` + `isolation` + `uvlo[]`; neither ever sees a field it cannot use.
 
 See [`docs/schema.md`](docs/schema.md) for the at-a-glance structure diagram and the full field-by-field reference.
 
@@ -41,6 +42,7 @@ schemas/
 examples/
   ucc256301-llc-resonant.json       hybrid-hysteretic LLC controller, both tiers
   ucc21520-isolated-gate-driver.json reinforced dual gate driver (isolation + dual UVLO)
+  tlv75733p-ldo.json                 1 A fixed-output LDO (the linearRegulator capability sub-object)
 docs/
   schema.md                structure diagram + field reference
 scripts/

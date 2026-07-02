@@ -580,6 +580,9 @@
                 "voltageReference": {
                     "$ref": "#/$defs/voltageReference"
                 },
+                "linearRegulator": {
+                    "$ref": "#/$defs/linearRegulator"
+                },
                 "hotSwap": {
                     "$ref": "#/$defs/hotSwap"
                 },
@@ -996,6 +999,69 @@
                     "description": "Headroom / dropout for series references, in volts.",
                     "type": "number",
                     "minimum": 0
+                }
+            }
+        },
+        "linearRegulator": {
+            "description": "Series linear (LDO) regulator characteristics (linearRegulator category). Only the LDO-specific surface lives here — everything else reuses the shared blocks: the input rail IS the supply rail, so the operating input-voltage range is the common electrical.supplyVoltage (abs-max input: supplyVoltageAbsoluteMax); the feedback reference of an adjustable part is the common electrical.referenceVoltage / referenceTolerance; ground/quiescent current is the common electrical.quiescentCurrent; the enable pin is a pins[] row (function 'enable'); current limit and thermal shutdown are protections[] rows (ocp / otp). Field set surveyed from TI TPS7A47 and TLV757P, ADI LT3045, onsemi NCP1117 datasheets.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "outputType": {
+                    "description": "Mechanism by which the output voltage is set (the companion numbers are outputVoltage / adjustableRange — value and mechanism are not redundant, cf. maxDutyCycle / maxDutyCycleClampType). 'fixed' = factory-trimmed (TLV757P, NCP1117-3.3); 'adjustable' = external resistor divider or SET-current resistor (NCP1117 ADJ, LT3045, TPS7A4701); 'pinSelectable' = pin-strapped voltage steps (TPS7A4700 ANY-OUT).",
+                    "type": "string",
+                    "enum": [
+                        "fixed",
+                        "adjustable",
+                        "pinSelectable"
+                    ]
+                },
+                "outputVoltage": {
+                    "description": "Factory-set output voltage of a fixed part, in volts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "adjustableRange": {
+                    "description": "Programmable output-voltage range of an adjustable / pin-selectable part, in volts (LT3045 0..15 V; NCP1117 ADJ 1.25..18.8 V; TPS7A4700 1.4..20.5 V).",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
+                },
+                "maxOutputCurrent": {
+                    "description": "Rated continuous output current, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "dropoutVoltage": {
+                    "description": "Input-output differential below which regulation is lost, in volts, specified at dropoutVoltageTestCurrent (LT3045 0.26 V at 0.5 A; TPS7A47 0.307 V at 1 A).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "dropoutVoltageTestCurrent": {
+                    "description": "Load current at which dropoutVoltage is specified, in amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "shutdownCurrent": {
+                    "description": "Input current with the enable pin de-asserted, in amperes (only for parts with an enable pin — the pin itself is a pins[] row, function 'enable').",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "psrr": {
+                    "description": "Power-supply rejection ratio, in dB, specified at psrrFrequency (LT3045 76 dB at 1 MHz; TPS7A47 82 dB at 100 Hz).",
+                    "type": "number"
+                },
+                "psrrFrequency": {
+                    "description": "Frequency at which psrr is specified, in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "outputNoise": {
+                    "description": "Integrated RMS output noise, in volts, over outputNoiseBand (LT3045 0.8e-6 V over 10 Hz..100 kHz).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "outputNoiseBand": {
+                    "description": "Integration band over which outputNoise is specified, in Hz (typically minimum 10, maximum 1e5).",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
                 }
             }
         },

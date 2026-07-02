@@ -6,7 +6,7 @@
     "description": "Controller-family-specific shared definitions for CTAS: the controlled vocabularies (category / modulation / conduction-mode / protection / pin-function / telemetry) and the controller package code. These are owned by CTAS, not PEAS, because no other component family uses them (CTAS follows the CONAS pattern: reuse the universal primitives from https://psma.com/peas/utils.json, own the family-specific enums here). Vocabularies derived from a datasheet survey of mainstream PWM / LLC / PFC / phase-shift / sync-rectifier / digital-PMBus controllers, isolated & non-isolated gate drivers, shunt regulators, voltage references, current-sense & isolated amplifiers, and hot-swap / eFuse controllers (TI, Analog Devices, onsemi, Infineon, ST, Renesas, Power Integrations).",
     "$defs": {
         "controllerCategory": {
-            "description": "Functional category of a control IC. THE primary selection discriminator (required at datasheetInfo.function.category and at the design seed). One value per part; multi-function parts pick the dominant function. `supervisor` covers power sequencers, voltage monitors, watchdog/reset and OVP-supervisor ICs; `loadSwitch` is a controlled-inrush switch without the current-limit/circuit-breaker of an `eFuse`.",
+            "description": "Functional category of a control IC. THE primary selection discriminator (required at datasheetInfo.function.category and at the design seed). One value per part; multi-function parts pick the dominant function. `supervisor` covers power sequencers, voltage monitors, watchdog/reset and OVP-supervisor ICs; `loadSwitch` is a controlled-inrush switch without the current-limit/circuit-breaker of an `eFuse`; `linearRegulator` is a series linear (LDO) regulator — a finished linear power stage rated to power a load, distinct from a `voltageReference` (a precision reference, mA-class at most).",
             "type": "string",
             "title": "controllerCategory",
             "enum": [
@@ -25,6 +25,7 @@
                 "isolatedAmplifier",
                 "voltageReference",
                 "shuntRegulator",
+                "linearRegulator",
                 "hotSwapController",
                 "eFuse",
                 "loadSwitch",

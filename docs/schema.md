@@ -41,8 +41,8 @@ CTAS  (https://psma.com/ctas/CTAS.json)   { inputs, controller, outputs }
 │   │       │                highVoltageStartup, capacitiveModeProtection, dynamicResponseEnhancer,
 │   │       │                ── capability sub-objects ──
 │   │       │                currentMode, errorAmplifier, gateDrive, uvlo[], isolation, senseAmplifier,
-│   │       │                shuntReference, voltageReference, hotSwap, syncRectifier, burstMode,
-│   │       │                brownOut, pfc, loadLine, synchronization, integratedPowerStage }
+│   │       │                shuntReference, voltageReference, linearRegulator, hotSwap, syncRectifier,
+│   │       │                burstMode, brownOut, pfc, loadLine, synchronization, integratedPowerStage }
 │   │       ├─ protections[] { kind*, threshold, hysteresis, mode, restartDelay, responseTime, rail }
 │   │       ├─ pins[]       { number*, name*, function* }      (slim map for stencil wiring)
 │   │       ├─ digitalInterface { kind, maxClock, revision, address{}, configurableViaNvm,
@@ -84,6 +84,7 @@ Separate from the datasheet `electrical` capability sub-objects (which describe 
 | `senseAmplifier` | current-sense / isolated amps / iso-modulators | `gain`/`gainOptions`, `cmrr`, `commonModeRange`, `outputFormat` (analog vs bitstream) |
 | `shuntReference` | TL431-class shunt regulators | cathode-current window, `dynamicImpedance`, `adjustableRange` |
 | `voltageReference` | series/shunt references | `tempco`, `outputNoise`, `longTermDrift`, line/load regulation |
+| `linearRegulator` | series linear (LDO) regulators | `outputType` (fixed/adjustable/pinSelectable), `outputVoltage`/`adjustableRange`, `maxOutputCurrent`, `dropoutVoltage` (+ test current), `shutdownCurrent`, `psrr` (+ frequency), `outputNoise` (+ band) |
 | `hotSwap` | hot-swap / eFuse | `currentLimit`, `circuitBreakerThreshold`, `powerLimit` (SOA), `faultResponse` |
 | `syncRectifier` | SR controllers | negative `turnOnThreshold`, `turnOffThreshold`, `proportionalGateDrive`, `ccmCycleLimit` |
 | `burstMode` | LLC / flyback light-load | entry/exit thresholds, `standbyPower` |
@@ -101,6 +102,7 @@ Separate from the datasheet `electrical` capability sub-objects (which describe 
 - **Multi-edge dead times** use `gateDrive.deadTimes[]` (named edges `legAB`/`legCD`/`primaryToSyncRectifier`…); single-edge parts use the scalar `electrical.deadTime`.
 - **Digital-ness is implied** by `digitalInterface.digitalControl`, not by a `modulation = "digital"` value — a digital controller still names its underlying law (e.g. `peakCurrentMode`).
 - **PMBus `READ_*` commands map 1:1 onto `telemetry[]` flags**, so there is no free-string supported-command list.
+- **An LDO's input rail IS its supply rail.** The `linearRegulator` sub-object therefore carries no input-voltage field: the operating input range is the common `electrical.supplyVoltage` (abs-max input: `supplyVoltageAbsoluteMax`), the adjustable part's feedback reference is the common `electrical.referenceVoltage`/`referenceTolerance`, and ground/quiescent current is the common `electrical.quiescentCurrent`. Enable pin → `pins[]` (`enable`); current limit / thermal shutdown → `protections[]` (`ocp`/`otp`). Condition-qualified scalars carry their condition (`dropoutVoltage` + `dropoutVoltageTestCurrent`, `psrr` + `psrrFrequency`, `outputNoise` + `outputNoiseBand`). Field set surveyed from TI TPS7A47 / TLV757P, ADI LT3045, onsemi NCP1117. `linearRegulator` is a switching-frequency-free category: the design seed does NOT require `topology`/`switchingFrequency` for it.
 - **GaN/Si power-stage FET physics are not duplicated** — `integratedPowerStage.semiconductorRef` points at the SAS record.
 - **`compliance` replaces the former (dangling) `business` block** the inline PEAS schema referenced; it reuses the shared `complianceTarget` primitive.
 

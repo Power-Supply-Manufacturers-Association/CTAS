@@ -1,0 +1,119 @@
+{
+    "inputs": {
+        "designRequirements": {
+            "name": "3.3 V point-of-load LDO for an MCU rail",
+            "category": "linearRegulator",
+            "supplyVoltageAvailable": {
+                "minimum": 4.5,
+                "maximum": 5.5,
+                "unit": "V"
+            },
+            "maximumQuiescentCurrent": 5e-05
+        }
+    },
+    "controller": {
+        "manufacturerInfo": {
+            "name": "Texas Instruments",
+            "reference": "TLV757P",
+            "status": "production",
+            "datasheetUrl": "https://www.ti.com/lit/ds/symlink/tlv757p.pdf",
+            "datasheetInfo": {
+                "part": {
+                    "partNumber": "TLV75733PDBVR",
+                    "case": "SOT-23-5",
+                    "deviceType": "regulator",
+                    "description": "1 A, low-IQ, low-dropout regulator, 3.3 V fixed output"
+                },
+                "function": {
+                    "category": "linearRegulator",
+                    "modulation": "notApplicable",
+                    "channelCount": 1
+                },
+                "electrical": {
+                    "supplyVoltage": {
+                        "minimum": 1.45,
+                        "maximum": 5.5,
+                        "unit": "V"
+                    },
+                    "supplyVoltageAbsoluteMax": 6.0,
+                    "quiescentCurrent": 2.5e-05,
+                    "referenceTolerance": 0.01,
+                    "softStartTime": {
+                        "nominal": 0.00055,
+                        "unit": "s"
+                    },
+                    "uvlo": [
+                        {
+                            "startThreshold": 1.3,
+                            "stopThreshold": 1.26,
+                            "side": "input"
+                        }
+                    ],
+                    "linearRegulator": {
+                        "outputType": "fixed",
+                        "outputVoltage": 3.3,
+                        "maxOutputCurrent": 1.0,
+                        "dropoutVoltage": 0.3,
+                        "dropoutVoltageTestCurrent": 1.0,
+                        "shutdownCurrent": 1e-07,
+                        "psrr": 46.0,
+                        "psrrFrequency": 100000.0,
+                        "outputNoise": 7.15e-05,
+                        "outputNoiseBand": {
+                            "minimum": 10.0,
+                            "maximum": 100000.0,
+                            "unit": "Hz"
+                        }
+                    }
+                },
+                "protections": [
+                    {
+                        "kind": "ocp",
+                        "threshold": 1.55,
+                        "mode": "foldback"
+                    },
+                    {
+                        "kind": "otp",
+                        "threshold": 165.0,
+                        "hysteresis": 10.0,
+                        "mode": "autorestart"
+                    }
+                ],
+                "pins": [
+                    {
+                        "number": 1,
+                        "name": "IN",
+                        "function": "vin"
+                    },
+                    {
+                        "number": 2,
+                        "name": "GND",
+                        "function": "gnd"
+                    },
+                    {
+                        "number": 3,
+                        "name": "EN",
+                        "function": "enable"
+                    }
+                ],
+                "thermal": {
+                    "operatingTemperature": {
+                        "minimum": -40.0,
+                        "maximum": 125.0,
+                        "unit": "Cel"
+                    },
+                    "maximumJunctionTemperature": 150.0,
+                    "thetaJA": 231.1
+                },
+                "mechanical": {
+                    "packageType": "SOT-23-5",
+                    "assemblyType": "smt"
+                },
+                "compliance": {
+                    "rohsCompliant": true
+                }
+            }
+        }
+    },
+    "outputs": []
+}
