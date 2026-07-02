@@ -94,6 +94,11 @@
                         "number": 3,
                         "name": "EN",
                         "function": "enable"
+                    },
+                    {
+                        "number": 5,
+                        "name": "OUT",
+                        "function": "vout"
                     }
                 ],
                 "thermal": {

@@ -168,6 +168,7 @@
                 "bootstrap",
                 "switchNode",
                 "logicInput",
+                "vout",
                 "enable",
                 "syncIn",
                 "syncOut",
