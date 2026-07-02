@@ -28,6 +28,16 @@ if (CTAS_BUILD_TESTS AND NOT EMSCRIPTEN)
     FetchContent_Declare(Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git GIT_TAG v3.8.1)
     FetchContent_MakeAvailable(Catch2)
+    # The sibling CIAS emitter library: the tests round-trip every lowered brick through
+    # CiasCircuitConverter (netlist emission + ngspice smoke), so the lowering is validated
+    # against the REAL consumer, not just its JSON shape. Library + Python module builds of
+    # CIAS are disabled — only the static CIAS lib is needed here.
+    if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../CIAS/CMakeLists.txt")
+        message(FATAL_ERROR "CIAS sibling repo not found next to CTAS — the PSMA workspace layout is required for the round-trip tests")
+    endif()
+    set(CIAS_BUILD_PYBIND OFF CACHE BOOL "" FORCE)
+    set(CIAS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../CIAS" cias)
     add_executable(ctas_tests tests/test_ctas.cpp)
-    target_link_libraries(ctas_tests PRIVATE CTAS Catch2::Catch2WithMain)
+    target_link_libraries(ctas_tests PRIVATE CTAS CIAS Catch2::Catch2WithMain)
 endif()
