@@ -8,8 +8,8 @@ Three gates:
   2. each examples/*.json validates against CTAS.json;
   3. each example is also a valid PEAS document (the `controller` branch).
 """
-import json
 import glob
+import json
 import os
 import sys
 
@@ -58,7 +58,7 @@ def main():
         rel = os.path.relpath(f, HERE)
         try:
             Draft202012Validator.check_schema(doc)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             errors += 1
             print(f"\nMETA-SCHEMA FAIL {rel}: {exc}")
             continue
@@ -106,7 +106,7 @@ def main():
                     print("   ", list(e.path), "->", e.message)
             else:
                 print(f"  citizenship OK (valid PEAS): {os.path.basename(f)}")
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         errors += 1
         print(f"\nFAIL: citizenship gate cannot run (PEAS not resolvable): {exc}")
 
