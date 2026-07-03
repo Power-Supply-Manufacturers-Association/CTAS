@@ -43,7 +43,7 @@ std::optional<double> opt_num(const json& b, const char* k) {
 
 // Every component atom is a complete PEAS document — the required `inputs` seed included —
 // so the emitted brick is CIAS-schema-valid end to end (component.data must validate against
-// peas.json; an atom without `inputs` would be a schema-illegal intermediate). The AAS/TBAS
+// peas.json; an atom without `inputs` would be a schema-illegal intermediate). The AAS/TDAS
 // designRequirements seeds require their family `deviceType` discriminator; the PEAS-native
 // behavioral seed carries no required fields.
 json seed_inputs(const char* deviceType) {
@@ -51,7 +51,7 @@ json seed_inputs(const char* deviceType) {
 }
 json seed_inputs_behavioral() { return json{{"designRequirements", json::object()}}; }
 
-// ── PEAS/AAS/TBAS component atoms (inline PEAS docs, RFC 0001 §6/§7) ──────────────────────────
+// ── PEAS/AAS/TDAS component atoms (inline PEAS docs, RFC 0001 §6/§7) ──────────────────────────
 
 // AAS comparator. threshold/hysteresis are OMITTED when not given: the AAS schema documents
 // "absent = 0 (ideal)" for both, so absence is the faithful encoding, not a fabricated value.
@@ -68,7 +68,7 @@ json comparator_atom(double vHigh, double vLow,
     return atom;
 }
 
-// TBAS oscillator (fixed or VCO when vcoGain is given).
+// TDAS oscillator (fixed or VCO when vcoGain is given).
 json oscillator_atom(const char* shape, double f, double amp, double off,
                      std::optional<double> duty = std::nullopt,
                      std::optional<double> vcoGain = std::nullopt) {
@@ -84,7 +84,7 @@ json oscillator_atom(const char* shape, double f, double amp, double off,
     return atom;
 }
 
-// TBAS SR latch.
+// TDAS SR latch.
 json latch_atom(double setThr, double rstThr, double hi, double lo, const char* dominance) {
     json atom;
     json& b = atom["timeBase"]["latch"]["behavioral"];
@@ -97,7 +97,7 @@ json latch_atom(double setThr, double rstThr, double hi, double lo, const char* 
     return atom;
 }
 
-// TBAS monostable timer (one-shot).
+// TDAS monostable timer (one-shot).
 json monostable_atom(double hi, double lo, double thr, const char* polarity, double onTime) {
     json atom;
     json& b = atom["timeBase"]["timer"]["behavioral"];
@@ -147,7 +147,7 @@ json comp(const char* nm, json data) { return json{{"name", nm}, {"data", std::m
 
 // A net named "0" is the SPICE global-ground idiom of the CIAS emitter (a net not exposed at a
 // port takes its own name as the node name; node 0 is ground). It is used ONLY where an internal
-// TBAS atom needs a DC reference (oscillator/latch/timer returns) — every such net still has the
+// TDAS atom needs a DC reference (oscillator/latch/timer returns) — every such net still has the
 // schema-required >= 2 endpoints.
 
 // ── synchronousRectifier (pre-existing) ───────────────────────────────────────────────────────
@@ -210,7 +210,7 @@ json lower_synchronous_rectifier(const json& b, const std::string& name) {
 
 // ── voltageModePWM (RFC 0001 §6.1) ────────────────────────────────────────────────────────────
 //
-// Error input pair (errP/errM) vs a TBAS sawtooth ramp at switchingFrequency, amplitude
+// Error input pair (errP/errM) vs a TDAS sawtooth ramp at switchingFrequency, amplitude
 // rampAmplitude, offset 0 -> AAS comparator -> gate at driveHigh/driveLow. The ramp RIDES on
 // errM (its outMinus is wired to the errM net), so the comparator sees the truly differential
 // (errP-errM) - ramp(t): gate is high while the error exceeds the ramp, duty = err/rampAmplitude.
@@ -248,9 +248,9 @@ json lower_voltage_mode_pwm(const json& b, const std::string& name) {
 
 // ── peakCurrentMode (RFC 0001 §6.2) ───────────────────────────────────────────────────────────
 //
-// TBAS square clock (duty 0.05 — the narrow set pulse of the clock template; amplitude 1/offset 0
+// TDAS square clock (duty 0.05 — the narrow set pulse of the clock template; amplitude 1/offset 0
 // are its internal logic levels, matched by the latch setThreshold 0.5) sets a reset-dominant
-// TBAS latch whose output rails are driveHigh/driveLow. A `controlled` block forms the comparator
+// TDAS latch whose output rails are driveHigh/driveLow. A `controlled` block forms the comparator
 // signal Ri*v(isenseP,isenseM) (+ the slope-compensation sawtooth when slopeCompensation [V/s] is
 // present, emitted as a same-frequency sawtooth of amplitude slopeCompensation*T volts); the
 // reset comparator (internal 0/1 logic) trips when that signal reaches the differential error
@@ -322,7 +322,7 @@ json lower_peak_current_mode(const json& b, const std::string& name) {
 
 // ── constantOnTime (RFC 0001 §6.3) ────────────────────────────────────────────────────────────
 //
-// Feedback comparator (differential errP/errM, internal 0/1 logic) triggers a TBAS monostable
+// Feedback comparator (differential errP/errM, internal 0/1 logic) triggers a TDAS monostable
 // (onTime, retriggerable false, risingEdge, threshold 0.5 = half the comparator swing) whose
 // output rails are driveHigh/driveLow -> gate. minimumOffTime present -> a second monostable
 // ("Blank", internal 0/1 logic) fires on the gate's FALLING edge (threshold at the midpoint of
@@ -369,7 +369,7 @@ json lower_constant_on_time(const json& b, const std::string& name) {
 
 // ── frequencyControl (RFC 0001 §6.4) ──────────────────────────────────────────────────────────
 //
-// Error input (errP/errM) steers a TBAS triangle VCO (frequency = centerFrequency, gain =
+// Error input (errP/errM) steers a TDAS triangle VCO (frequency = centerFrequency, gain =
 // vcoGain, amplitude 1, offset 0 — span 0..1). Two comparators on the triangle derive the
 // complementary gates: gateA while tri > 0.5+delta, gateB while tri < 0.5-delta. With the CIAS
 // triangle span convention (offset..offset+amplitude over T/2) the slope is 2*amplitude*f, so

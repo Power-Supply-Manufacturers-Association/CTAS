@@ -23,7 +23,7 @@ PSMA = os.path.dirname(HERE)
 
 def load_all():
     resources = []
-    for repo in ("PEAS", "MAS", "CAS", "SAS", "RAS", "CONAS", "CTAS", "AAS", "TBAS", "TAS", "CIAS", "COAS"):
+    for repo in ("PEAS", "MAS", "CAS", "SAS", "RAS", "CONAS", "CTAS", "AAS", "TDAS", "TAS", "CIAS", "COAS"):
         pat = os.path.join(PSMA, repo, "schemas", "**", "*.json")
         for f in glob.glob(pat, recursive=True):
             try:

@@ -2,7 +2,7 @@
 
 // CtasConverter — "generate a CIAS element (leaf) from a CTAS controller".
 //
-// ctas_to_cias(peas, fidelity) lowers a CTAS `controller` to a CIAS brick built from AAS/TBAS/PEAS
+// ctas_to_cias(peas, fidelity) lowers a CTAS `controller` to a CIAS brick built from AAS/TDAS/PEAS
 // behavioral atoms — the "controller as one part" route (the topology places a single controller
 // component; this expands it). Driven by the agnostic ideal control law in `controller.behavioral`
 // (a complete oneOf keyed by controlScheme, PEAS-RFC 0001 §5.3; recipes per §6).
@@ -12,16 +12,16 @@
 //       "current"     — two comparators on the tank-current sign; ports senseP/senseM/gA/gB.
 //       "drainSource" — four comparators, per-switch body-diode emulation; ports
 //                       nodeC/nodeD/vSense/gSense + gE/gF/gG/gH.
-//   - voltageModePWM       : TBAS sawtooth ramp + AAS comparator; ports errP/errM/gate.
+//   - voltageModePWM       : TDAS sawtooth ramp + AAS comparator; ports errP/errM/gate.
 //                            maximumDutyCycle -> controlled min() clamp on the error.
-//   - peakCurrentMode      : TBAS square clock -> reset-dominant TBAS latch; comparator of
+//   - peakCurrentMode      : TDAS square clock -> reset-dominant TDAS latch; comparator of
 //                            Ri*isense (+ slope-comp sawtooth) vs error resets it; ports
 //                            errP/errM/isenseP/isenseM/gate (isense carries 1 V/A).
 //                            maximumDutyCycle -> second comparator OR'd into reset.
-//   - constantOnTime       : feedback comparator -> TBAS monostable (onTime, non-retriggerable);
+//   - constantOnTime       : feedback comparator -> TDAS monostable (onTime, non-retriggerable);
 //                            ports errP/errM/gate. minimumOffTime -> blanking one-shot gating
 //                            the trigger.
-//   - frequencyControl     : TBAS triangle VCO (centerFrequency, vcoGain) + two comparators at
+//   - frequencyControl     : TDAS triangle VCO (centerFrequency, vcoGain) + two comparators at
 //                            0.5±delta for complementary gates with dead time; ports
 //                            errP/errM/gateA/gateB. minimum/maximumFrequency -> controlled
 //                            min()/max() clamp on the control voltage.

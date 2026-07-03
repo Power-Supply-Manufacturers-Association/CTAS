@@ -31,7 +31,7 @@
     "$defs": {
         "behavioral": {
             "title": "controllerBehavioral",
-            "description": "Simulator-agnostic IDEAL behavioural model of the controller's CONTROL LAW, for circuit simulation — distinct from the datasheet `electrical` capability sub-objects (which describe a resolved real part). Present on an otherwise part-less document to describe an ideal control block that a simulator backend realises from behavioral atoms (AAS comparator/multiplier + TBAS oscillator/timer/latch, per PEAS-RFC 0001). A complete oneOf keyed by controlScheme: each scheme pins its discriminator with const and carries exactly the parameters its ctas_to_cias lowering consumes.",
+            "description": "Simulator-agnostic IDEAL behavioural model of the controller's CONTROL LAW, for circuit simulation — distinct from the datasheet `electrical` capability sub-objects (which describe a resolved real part). Present on an otherwise part-less document to describe an ideal control block that a simulator backend realises from behavioral atoms (AAS comparator/multiplier + TDAS oscillator/timer/latch, per PEAS-RFC 0001). A complete oneOf keyed by controlScheme: each scheme pins its discriminator with const and carries exactly the parameters its ctas_to_cias lowering consumes.",
             "oneOf": [
                 {
                     "description": "Synchronous-rectifier commutation: comparator on the sensed signal drives the SR gates.",
@@ -74,7 +74,7 @@
                     "required": [ "controlScheme" ]
                 },
                 {
-                    "description": "Voltage-mode PWM: error amplifier vs a fixed-frequency sawtooth ramp (TBAS oscillator) into a comparator that drives the gate.",
+                    "description": "Voltage-mode PWM: error amplifier vs a fixed-frequency sawtooth ramp (TDAS oscillator) into a comparator that drives the gate.",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -110,7 +110,7 @@
                     "required": [ "controlScheme", "switchingFrequency", "rampAmplitude" ]
                 },
                 {
-                    "description": "Peak-current-mode: clock (TBAS oscillator) sets the gate latch (TBAS latch, reset-dominant); comparator of sensed current + slope compensation vs the error voltage resets it.",
+                    "description": "Peak-current-mode: clock (TDAS oscillator) sets the gate latch (TDAS latch, reset-dominant); comparator of sensed current + slope compensation vs the error voltage resets it.",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -151,7 +151,7 @@
                     "required": [ "controlScheme", "switchingFrequency", "currentSenseGain" ]
                 },
                 {
-                    "description": "Constant-on-time: feedback comparator triggers a fixed on-time one-shot (TBAS timer, monostable, non-retriggerable).",
+                    "description": "Constant-on-time: feedback comparator triggers a fixed on-time one-shot (TDAS timer, monostable, non-retriggerable).",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
@@ -181,7 +181,7 @@
                     "required": [ "controlScheme", "onTime" ]
                 },
                 {
-                    "description": "Frequency modulation (LLC/resonant): error amplifier steers a VCO (TBAS oscillator with frequencyControl); two staggered comparators derive the complementary half-bridge gates with dead time.",
+                    "description": "Frequency modulation (LLC/resonant): error amplifier steers a VCO (TDAS oscillator with frequencyControl); two staggered comparators derive the complementary half-bridge gates with dead time.",
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
