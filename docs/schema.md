@@ -44,7 +44,7 @@ CTAS  (https://psma.com/ctas/CTAS.json)   { inputs, controller, outputs }
 │   │       │                shuntReference, voltageReference, linearRegulator, hotSwap, syncRectifier,
 │   │       │                burstMode, brownOut, pfc, loadLine, synchronization, integratedPowerStage }
 │   │       ├─ protections[] { kind*, threshold, hysteresis, mode, restartDelay, responseTime, rail }
-│   │       ├─ pins[]       { number*, name*, function* }      (slim map for stencil wiring)
+│   │       ├─ pins[]       { pin*, name*, function* }         (slim map for stencil wiring; the shared PEAS pin base — designator is the string `pin`, vocabulary is PEAS `pinFunction`, hoisted from CTAS controllerPinFunction 2026-08)
 │   │       ├─ digitalInterface { kind, maxClock, revision, address{}, configurableViaNvm,
 │   │       │                     nonvolatileConfig{}, telemetry[], vidDac{}, digitalControl{} }
 │   │       ├─ thermal     → datasheetInfoThermal + {maximumJunctionTemperature, thetaJA, thetaJC}

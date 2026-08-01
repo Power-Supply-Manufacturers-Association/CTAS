@@ -1322,27 +1322,19 @@
             }
         },
         "pin": {
-            "description": "One pin of the controller. The (number, name, function) triple is canonical and unique within a part.",
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "number",
-                "name",
-                "function"
-            ],
-            "properties": {
-                "number": {
-                    "type": "integer",
-                    "minimum": 1
+            "description": "One pin of the controller — the shared PEAS pin base (hoisted 2026-08: the former CTAS-local {number, name, function} shape and the controllerPinFunction vocabulary now live in PEAS utils as pin/pinFunction, so a controller's 'ground' is machine-comparable with every other family's). The (pin, name, function) triple is canonical and unique within a part; CTAS additionally requires name (the stencil wires by it).",
+            "allOf": [
+                {
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/pin"
                 },
-                "name": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "function": {
-                    "$ref": "./utils.json#/$defs/controllerPinFunction"
+                {
+                    "type": "object",
+                    "required": [
+                        "name"
+                    ]
                 }
-            }
+            ],
+            "unevaluatedProperties": false
         },
         "digitalInterface": {
             "description": "Digital communication + configuration interface (digital / PMBus / programmable parts). A part with no digital interface omits this object.",

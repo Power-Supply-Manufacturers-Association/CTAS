@@ -129,17 +129,17 @@
                 ],
                 "pins": [
                     {
-                        "number": 1,
+                        "pin": "1",
                         "name": "HB",
                         "function": "switchNode"
                     },
                     {
-                        "number": 5,
+                        "pin": "5",
                         "name": "FB",
                         "function": "feedback"
                     },
                     {
-                        "number": 16,
+                        "pin": "16",
                         "name": "HV",
                         "function": "vin"
                     }
