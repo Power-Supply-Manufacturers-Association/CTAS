@@ -76,7 +76,7 @@ Separate from the datasheet `electrical` capability sub-objects (which describe 
 
 | Sub-object (`electrical.*`) | Populated for | Carries (headline) |
 | --- | --- | --- |
-| `currentMode` | peak/avg current-mode PWM, PFC | `maxThresholdVoltage` (CS comparator clamp — UC384x 1.0 V) |
+| `currentMode` | peak/avg current-mode PWM, PFC | `maxThresholdVoltage` (CS comparator clamp, **signed** — positive for source/series sensing, UC384x 1.0 V; negative for return-path sensing, UCC2806x / ICE3PCS01G −0.2 V) |
 | `errorAmplifier` | all switchers | `type`, `transconductance`/`openLoopGain`, `gainBandwidth`, `secondInstance` (PFC 2nd loop) |
 | `gateDrive` | drivers + switchers with on-die output | source/sink peak, `driveVoltage`, `negativeBiasMin`, prop-delay + matching, `deadTimes[]`, Miller clamp |
 | `uvlo[]` | nearly universal | per-rail `startThreshold`/`stopThreshold`/`side` (array: input + output + floating) |

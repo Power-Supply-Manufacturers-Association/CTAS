@@ -615,9 +615,8 @@
             "additionalProperties": false,
             "properties": {
                 "maxThresholdVoltage": {
-                    "description": "Maximum current-sense comparator threshold (peak CS clamp), in volts (UC384x 1.0 V, NCP1250 0.8 V, UCC28950 2.0 V).",
-                    "type": "number",
-                    "minimum": 0
+                    "description": "Maximum current-sense comparator threshold (peak CS clamp), in volts. SIGNED, following the datasheet's own polarity: positive when the sense element is in the source/high side so the CS pin swings up with current (UC384x 1.0 V, NCP1250 0.8 V, UCC28950 2.0 V); negative when the sense element is in the return path so the CS pin swings down with current (UCC28060/28061/28065 -0.2 V, ICE3PCS01G -0.2 V). Never store a magnitude in place of a negative datasheet value.",
+                    "type": "number"
                 }
             }
         },
