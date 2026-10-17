@@ -816,59 +816,11 @@
             }
         },
         "isolationRating": {
-            "description": "Galvanic-isolation barrier rating (isolated gate drivers, isolated amplifiers, digital isolators, opto feedback). Absent on non-isolated parts.",
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "isolationType": {
-                    "type": "string",
-                    "enum": [
-                        "none",
-                        "functional",
-                        "basic",
-                        "reinforced",
-                        "double"
-                    ]
-                },
-                "withstandVoltageRms": {
-                    "description": "1-minute withstand (VISO), in volts RMS.",
-                    "type": "number",
-                    "minimum": 0
-                },
-                "workingVoltage": {
-                    "description": "Maximum repetitive working isolation voltage (VIORM, peak), in volts.",
-                    "type": "number",
-                    "minimum": 0
-                },
-                "surgeVoltage": {
-                    "description": "Surge isolation voltage (VIOSM), in volts.",
-                    "type": "number",
-                    "minimum": 0
-                },
-                "cmti": {
-                    "description": "Common-mode transient immunity, in volts per second (UCC21520 125e9 = 125 V/ns).",
-                    "type": "number",
-                    "minimum": 0
-                },
-                "barrierCapacitance": {
-                    "description": "Barrier capacitance, in farads.",
-                    "type": "number",
-                    "minimum": 0
-                },
-                "creepage": {
-                    "description": "External creepage across the package, in metres.",
-                    "type": "number",
-                    "minimum": 0
-                },
-                "clearance": {
-                    "description": "External clearance across the package, in metres.",
-                    "type": "number",
-                    "minimum": 0
-                }
-            }
+            "description": "Galvanic-isolation barrier rating. Defined once in PEAS utils (hoisted from here 2026-10 with the same key names); kept as a local alias so the CTAS-internal reference #/$defs/isolationRating is unchanged.",
+            "$ref": "https://psma.com/peas/utils.json#/$defs/isolationRating"
         },
         "senseAmplifier": {
-            "description": "Current-sense / isolated amplifier (and isolated delta-sigma modulator) characteristics. Used by currentSenseAmplifier and isolatedAmplifier categories; outputFormat distinguishes analog amps from bitstream isolated ADCs (AMC1306).",
+            "description": "Current-sense / isolated amplifier (and isolated delta-sigma modulator) characteristics. Used by currentSenseAmplifier and the deprecated isolatedAmplifier category (new isolated amplifiers / modulators go to AAS differenceAmplifier / adc with electrical.isolation); outputFormat distinguishes analog amps from bitstream isolated ADCs (AMC1306).",
             "type": "object",
             "additionalProperties": false,
             "properties": {

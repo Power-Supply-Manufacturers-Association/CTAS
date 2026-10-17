@@ -19,7 +19,8 @@ CTAS covers the whole control-IC space with **one** agnostic schema, discriminat
 | `voltageReference` | LM4040, REF5025 |
 | `linearRegulator` | LT3045, TPS7A47, TLV757P, NCP1117 |
 | `batteryCharger` | MAX17415, BQ24610 |
-| `currentSenseAmplifier` / `isolatedAmplifier` | INA240, AMC1301, AMC1306 |
+| `currentSenseAmplifier` | INA240, INA181 (non-isolated shunt amps) |
+| `isolatedAmplifier` | **deprecated** (0 rows; removal at the next major) — isolated amps / modulators (AMC1301, AMC1306) are AAS `differenceAmplifier` / `adc` with `electrical.isolation` |
 | `hotSwapController` / `eFuse` / `loadSwitch` | LM5066, TPS25940, TPS22918 |
 | `supervisor` | TPS3700, UCD9090, ADM1266 (sequencer / voltage-monitor / watchdog) |
 
