@@ -53,7 +53,10 @@
                         "outputType": "fixed",
                         "outputVoltage": 3.3,
                         "maxOutputCurrent": 1.0,
-                        "dropoutVoltage": 0.3,
+                        "dropoutVoltage": {
+                            "nominal": 0.3,
+                            "maximum": 0.425
+                        },
                         "dropoutVoltageTestCurrent": 1.0,
                         "shutdownCurrent": 1e-07,
                         "psrr": 46.0,

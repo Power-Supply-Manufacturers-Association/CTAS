@@ -995,9 +995,8 @@
                     "minimum": 0
                 },
                 "dropoutVoltage": {
-                    "description": "Headroom / dropout for series references, in volts.",
-                    "type": "number",
-                    "minimum": 0
+                    "description": "Headroom / dropout for series references, in volts: nominal = datasheet typical, maximum = guaranteed maximum, minimum = guaranteed minimum (when printed).",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
                 }
             }
         },
@@ -1030,9 +1029,8 @@
                     "minimum": 0
                 },
                 "dropoutVoltage": {
-                    "description": "Input-output differential below which regulation is lost, in volts, specified at dropoutVoltageTestCurrent (LT3045 0.26 V at 0.5 A; TPS7A47 0.307 V at 1 A).",
-                    "type": "number",
-                    "minimum": 0
+                    "description": "Input-output differential below which regulation is lost, in volts, specified at dropoutVoltageTestCurrent: nominal = datasheet typical, maximum = guaranteed maximum, minimum = guaranteed minimum (when printed) (LT3045 typical 0.26 V at 0.5 A; TPS7A47 typical 0.307 V at 1 A).",
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
                 },
                 "dropoutVoltageTestCurrent": {
                     "description": "Load current at which dropoutVoltage is specified, in amperes.",
