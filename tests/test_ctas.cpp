@@ -157,7 +157,7 @@ TEST_CASE("peakCurrentMode lowers to clock + sense gain + comparator + reset-dom
     CHECK_THAT(net, ContainsSubstring("ESense sense errM isenseP isenseM 0.05"));
     // Reset-dominant latch: the RESET comparison is the OUTER ternary; rails 12/0 on the gate.
     CHECK_THAT(net, ContainsSubstring(
-        "BLatch_st Latch__d 0 V=(V(reset,0)>(0.5))?(0):((V(clk,0)>(0.5))?(1):(V(Latch__q)))"));
+        "BLatch_st Latch__d 0 V=(V(reset,0)>(0.5))?(0):((V(clk,0)>(0.5))?(1):((V(Latch__q)>0.5)?(1):(0)))"));
     CHECK_THAT(net, ContainsSubstring("BLatch gate 0 V=(0)+((12)-(0))*V(Latch__q)"));
 }
 
